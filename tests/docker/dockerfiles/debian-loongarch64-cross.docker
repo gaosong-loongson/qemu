@@ -1,0 +1,36 @@
+#
+# Docker cross-compiler target
+#
+# This docker target builds on the debian stretch base image,
+# using a cross-tools for Loongarch64 cores from:
+# https://github.com/loongson/build-tools/releases
+#
+FROM qemu/debian10
+
+ENV PACKAGES \
+    make \
+    gcc \
+    pkg-config \
+    libglib2.0-dev \
+    libspice-protocol-dev \
+    libspice-server-dev \
+    g++ \
+    libusbredirparser-dev \
+    libusb-1.0-0-dev \
+    libpixman-1-dev \
+    wget \
+    apt-utils \
+    libfdt-dev
+
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get -y install --no-install-recommends $PACKAGES
+
+RUN dpkg -l $PACKAGES | sort > /packages.txt
+
+RUN wget https://github.com/loongson/build-tools/releases/latest/download/loongarch64-clfs-20211202-cross-tools.tar.xz && \
+    tar -vxf loongarch64-clfs-20211202-cross-tools.tar.xz -C /opt && \
+    rm -rf loongarch64-clfs-20211202-cross-tools.tar.xz
+
+ENV PATH $PATH:/opt/cross-tools/bin
+
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/cross-tools/lib:/opt/cross-tools/loongarch64-unknown-linux-gnu/lib

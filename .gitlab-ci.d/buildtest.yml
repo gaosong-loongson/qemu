@@ -286,6 +286,28 @@ build-user-hexagon:
     CONFIGURE_ARGS: --disable-tools --disable-docs --enable-debug-tcg
     MAKE_CHECK_ARGS: check-tcg
 
+# Build loongarch64-linux-user and loongarch64-softmmu on debian10 system and
+# try to run some tcg tests.
+build-user-loongarch64:
+  extends: .native_build_job_template
+  needs:
+    job: loongarch64-debian-cross-cotainer
+  variables:
+    IMAGE: debian-loongarch64-cross
+    CONFIGURE_ARGS: --disable-tools --disable-system --enable-debug
+    TARGETS: loongarch64-linux-user
+    MAKE_CHECK_ARGS: check-tcg
+
+build-softmmu-loongarch64:
+  extends: .native_build_job_template
+  needs:
+    job: loongarch64-debian-cross-cotainer
+  variables:
+    IMAGE: debian-loongarch64-cross
+    CONFIGURE_ARGS: --disable-tools --enable-debug
+    TARGETS: loongarch64-softmmu
+    MAKE_CHECK_ARGS: check-tcg
+
 # Only build the softmmu targets we have check-tcg tests for
 build-some-softmmu:
   extends: .native_build_job_template

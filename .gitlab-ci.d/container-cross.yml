@@ -82,6 +82,13 @@ hppa-debian-cross-container:
   variables:
     NAME: debian-hppa-cross
 
+loongarch64-debian-cross-cotainer:
+  extends: .container_job_template
+  stage: containers-layer2
+  needs: ['amd64-debian10-container']
+  variables:
+    NAME: debian-loongarch64-cross
+
 m68k-debian-cross-container:
   extends: .container_job_template
   stage: containers-layer2
