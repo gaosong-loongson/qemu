@@ -119,6 +119,7 @@ static void loongarch_3a5000_initfn(Object *obj)
     data = FIELD_DP32(data, CPUCFG2, FP_VER, 1);
     data = FIELD_DP32(data, CPUCFG2, LLFTP, 1);
     data = FIELD_DP32(data, CPUCFG2, LLFTP_VER, 1);
+    data = FIELD_DP32(data, CPUCFG2, LSPW, 1);
     data = FIELD_DP32(data, CPUCFG2, LAM, 1);
     env->cpucfg[2] = data;
 
