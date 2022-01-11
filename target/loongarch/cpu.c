@@ -165,6 +165,14 @@ static void loongarch_3a5000_initfn(Object *obj)
     env->cpucfg[20] = data;
 
     env->CSR_ASID = FIELD_DP64(0, CSR_ASID, ASIDBITS, 0xa);
+
+#ifndef CONFIG_USER_ONLY
+    env->address_space_iocsr = g_malloc(sizeof(*env->address_space_iocsr));
+    env->system_iocsr = g_malloc(sizeof(*env->system_iocsr));
+    memory_region_init_io(env->system_iocsr, obj, NULL,
+                          env, "iocsr", UINT64_MAX);
+    address_space_init(env->address_space_iocsr, env->system_iocsr, "IOCSR");
+#endif
 }
 
 static void loongarch_cpu_list_entry(gpointer data, gpointer user_data)
