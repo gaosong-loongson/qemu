@@ -64,6 +64,29 @@ static const MemoryRegionOps loongarch_qemu_ops = {
     },
 };
 
+static void loongarch_cpu_set_irq(void *opaque, int irq, int level)
+{
+    LoongArchCPU *cpu = opaque;
+    CPULoongArchState *env = &cpu->env;
+    CPUState *cs = CPU(cpu);
+
+    if (irq < 0 || irq > N_IRQS) {
+        return;
+    }
+
+    if (level) {
+        env->CSR_ESTAT |= 1 << irq;
+    } else {
+        env->CSR_ESTAT &= ~(1 << irq);
+    }
+
+    if (FIELD_EX64(env->CSR_ESTAT, CSR_ESTAT, IS)) {
+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+    } else {
+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+    }
+}
+
 static void loongarch_init(MachineState *machine)
 {
     const char *cpu_model = machine->cpu_type;
@@ -88,6 +111,9 @@ static void loongarch_init(MachineState *machine)
     /* Init CPUs */
     for (i = 0; i < machine->smp.cpus; i++) {
         la_cpu = LOONGARCH_CPU(cpu_create(machine->cpu_type));
+        timer_init_ns(&la_cpu->timer, QEMU_CLOCK_VIRTUAL,
+                      &loongarch_constant_timer_cb, la_cpu);
+        qdev_init_gpio_in(DEVICE(la_cpu), loongarch_cpu_set_irq, N_IRQS);
 
         timer_init_ns(&la_cpu->timer, QEMU_CLOCK_VIRTUAL,
                       &loongarch_constant_timer_cb, la_cpu);
