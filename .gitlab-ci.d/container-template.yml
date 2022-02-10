@@ -1,5 +1,7 @@
 .container_job_template:
   image: docker:stable
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
   stage: containers
   services:
     - docker:dind

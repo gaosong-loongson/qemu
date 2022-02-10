@@ -5,6 +5,9 @@
 LOONGARCH64_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/loongarch64/system
 VPATH+=$(LOONGARCH64_SYSTEM_SRC)
 
+# loongarch64 system tests need more time
+TIMEOUT= 360
+
 # These objects provide the basic boot code and helper functions for all tests
 CRT_OBJS=boot.o
 
