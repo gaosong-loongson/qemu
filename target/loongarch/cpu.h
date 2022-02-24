@@ -12,6 +12,7 @@
 #include "fpu/softfloat-types.h"
 #include "hw/registerfields.h"
 #include "cpu-csr.h"
+#include "qemu/timer.h"
 
 #define TCG_GUEST_DEFAULT_MO (0)
 
@@ -148,6 +149,9 @@ FIELD(CPUCFG20, L3IU_SIZE, 24, 7)
 extern const char * const regnames[32];
 extern const char * const fregnames[32];
 
+#define N_IRQS      14
+#define IRQ_TIMER   11
+
 typedef struct CPUArchState {
     uint64_t gpr[32];
     uint64_t pc;
@@ -236,6 +240,7 @@ struct ArchCPU {
 
     CPUNegativeOffsetState neg;
     CPULoongArchState env;
+    QEMUTimer timer;
 };
 
 #define TYPE_LOONGARCH_CPU "loongarch-cpu"
@@ -297,4 +302,9 @@ enum {
 #define LOONGARCH_CPU_TYPE_NAME(model) model LOONGARCH_CPU_TYPE_SUFFIX
 #define CPU_RESOLVING_TYPE TYPE_LOONGARCH_CPU
 
+void loongarch_constant_timer_cb(void *opaque);
+uint64_t cpu_loongarch_get_constant_timer_counter(LoongArchCPU *cpu);
+uint64_t cpu_loongarch_get_constant_timer_ticks(LoongArchCPU *cpu);
+void cpu_loongarch_store_constant_timer_config(LoongArchCPU *cpu,
+                                               uint64_t value);
 #endif /* LOONGARCH_CPU_H */
