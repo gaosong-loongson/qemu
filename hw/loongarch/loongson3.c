@@ -641,7 +641,7 @@ static void loongarch_init(MachineState *machine)
     int i;
 
     if (!cpu_model) {
-        cpu_model = LOONGARCH_CPU_TYPE_NAME("la464");
+        cpu_model = "la464";
     }
 
     if (!strstr(cpu_model, "la464")) {
@@ -758,7 +758,7 @@ static void loongarch_class_init(ObjectClass *oc, void *data)
     mc->desc = "Loongson-3A5000 LS7A1000 machine";
     mc->init = loongarch_init;
     mc->default_ram_size = 1 * GiB;
-    mc->default_cpu_type = LOONGARCH_CPU_TYPE_NAME("la464");
+    mc->default_cpu_type = "la464";
     mc->default_ram_id = "loongarch.ram";
     mc->max_cpus = LOONGARCH_MAX_VCPUS;
     mc->is_default = 1;
