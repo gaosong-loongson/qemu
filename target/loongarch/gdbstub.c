@@ -47,7 +47,7 @@ static int loongarch_gdb_get_fpu(CPULoongArchState *env,
                                  GByteArray *mem_buf, int n)
 {
     if (0 <= n && n < 32) {
-        return gdb_get_reg64(mem_buf, env->fpr[n]);
+        return gdb_get_reg64(mem_buf, env->fpr[n].d);
     } else if (32 <= n && n < 40) {
         return gdb_get_reg8(mem_buf, env->cf[n - 32]);
     } else if (n == 40) {
@@ -62,7 +62,7 @@ static int loongarch_gdb_set_fpu(CPULoongArchState *env,
     int length = 0;
 
     if (0 <= n && n < 32) {
-        env->fpr[n] = ldq_p(mem_buf);
+        env->fpr[n].d = ldq_p(mem_buf);
         length = 8;
     } else if (32 <= n && n < 40) {
         env->cf[n - 32] = ldub_p(mem_buf);

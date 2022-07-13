@@ -76,17 +76,17 @@ void dump_wr(wr_t *p) {
 
 static inline void clear_msacsr_cause(CPULoongArchState *env)
 {
-    SET_FP_CAUSE(env->active_tc.msacsr, 0);
+    SET_FP_CAUSE(env->fcsr0, 0);
 }
 
 static inline void check_msacsr_cause(CPULoongArchState *env, uintptr_t retaddr)
 {
-    if ((GET_FP_CAUSE(env->active_tc.msacsr) &
-            (GET_FP_ENABLE(env->active_tc.msacsr) | FP_UNIMPLEMENTED)) == 0) {
-        UPDATE_FP_FLAGS(env->active_tc.msacsr,
-                GET_FP_CAUSE(env->active_tc.msacsr));
+    if ((GET_FP_CAUSE(env->fcsr0) &
+            (GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED)) == 0) {
+        UPDATE_FP_FLAGS(env->fcsr0,
+                GET_FP_CAUSE(env->fcsr0));
     } else {
-        do_raise_exception(env, EXCP_MSAFPE, retaddr);
+        do_raise_exception(env, EXCP_FPE, retaddr);
     }
 }
 
@@ -103,7 +103,7 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
     int cause;
     int enable;
 
-    ieee_ex = get_float_exception_flags(&env->active_tc.msa_fp_status);
+    ieee_ex = get_float_exception_flags(&env->fp_status);
 
     /* QEMU softfloat does not signal all underflow cases */
     if (denormal) {
@@ -111,11 +111,11 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
     }
 
     c = ieee_ex_to_mips(ieee_ex);
-    enable = GET_FP_ENABLE(env->active_tc.msacsr) | FP_UNIMPLEMENTED;
+    enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
 
     /* Set Inexact (I) when flushing inputs to zero */
     if ((ieee_ex & float_flag_input_denormal) &&
-            (env->active_tc.msacsr & MSACSR_FS_MASK) != 0) {
+            (env->fcsr0 & MSACSR_FS_MASK) != 0) {
         if (action & CLEAR_IS_INEXACT) {
             c &= ~FP_INEXACT;
         } else {
@@ -125,7 +125,7 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
 
     /* Set Inexact (I) and Underflow (U) when flushing outputs to zero */
     if ((ieee_ex & float_flag_output_denormal) &&
-            (env->active_tc.msacsr & MSACSR_FS_MASK) != 0) {
+            (env->fcsr0 & MSACSR_FS_MASK) != 0) {
         c |= FP_INEXACT;
         if (action & CLEAR_FS_UNDERFLOW) {
             c &= ~FP_UNDERFLOW;
@@ -161,17 +161,17 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
          * No enabled exception, update the MSACSR Cause
          * with all current exceptions
          */
-        SET_FP_CAUSE(env->active_tc.msacsr,
-                (GET_FP_CAUSE(env->active_tc.msacsr) | c));
+        SET_FP_CAUSE(env->fcsr0,
+                (GET_FP_CAUSE(env->fcsr0) | c));
     } else {
         /* Current exceptions are enabled */
-        if ((env->active_tc.msacsr & MSACSR_NX_MASK) == 0) {
+        if ((env->fcsr0 & MSACSR_NX_MASK) == 0) {
             /*
              * Exception(s) will trap, update MSACSR Cause
              * with all enabled exceptions
              */
-            SET_FP_CAUSE(env->active_tc.msacsr,
-                    (GET_FP_CAUSE(env->active_tc.msacsr) | c));
+            SET_FP_CAUSE(env->fcsr0,
+                    (GET_FP_CAUSE(env->fcsr0) | c));
         }
     }
 
@@ -180,7 +180,7 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
 
 static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 {
-    int enable = GET_FP_ENABLE(env->active_tc.msacsr) | FP_UNIMPLEMENTED;
+    int enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
     return c & enable;
 }
 
@@ -194,7 +194,7 @@ static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 
 #define MSA_FLOAT_UNOP(DEST, OP, ARG, BITS)                                 \
     do {                                                                    \
-        float_status *status = &env->active_tc.msa_fp_status;               \
+        float_status *status = &env->fp_status;               \
         int c;                                                              \
                                                                             \
         set_float_exception_flags(0, status);                               \
@@ -208,7 +208,7 @@ static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 
 #define MSA_FLOAT_BINOP(DEST, OP, ARG1, ARG2, BITS)                         \
     do {                                                                    \
-        float_status *status = &env->active_tc.msa_fp_status;               \
+        float_status *status = &env->fp_status;               \
         int c;                                                              \
                                                                             \
         set_float_exception_flags(0, status);                               \
@@ -222,7 +222,7 @@ static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 
 #define MSA_FLOAT_MULADD(DEST, ARG1, ARG2, ARG3, NEGATE, BITS)              \
     do {                                                                    \
-        float_status *status = &env->active_tc.msa_fp_status;               \
+        float_status *status = &env->fp_status;               \
         int c;                                                              \
                                                                             \
         set_float_exception_flags(0, status);                               \
@@ -236,7 +236,7 @@ static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 
 #define MSA_FLOAT_NEGATE_MULADD(DEST, ARG1, ARG2, ARG3, NEGATE, BITS)              \
     do {                                                                    \
-        float_status *status = &env->active_tc.msa_fp_status;               \
+        float_status *status = &env->fp_status;               \
         int c;                                                              \
                                                                             \
         set_float_exception_flags(0, status);                               \
@@ -255,7 +255,7 @@ static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 
 #define MSA_FLOAT_UNOP0(DEST, OP, ARG, BITS)                                \
     do {                                                                    \
-        float_status *status = &env->active_tc.msa_fp_status;               \
+        float_status *status = &env->fp_status;               \
         int c;                                                              \
                                                                             \
         set_float_exception_flags(0, status);                               \
@@ -1429,7 +1429,7 @@ void helper_lsx_vreplve_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
 
-    lsx_vreplve_df(df, pwd, pws, env->active_tc.gpr[rt]);
+    lsx_vreplve_df(df, pwd, pws, env->gpr[rt]);
 }
 
 #define CONCATENATE_AND_SLIDE(s, k)             \
@@ -1480,7 +1480,7 @@ void helper_lsx_vextrcol_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
 
-    lsx_vextrcol_df(df, pwd, pws, env->active_tc.gpr[rt]);
+    lsx_vextrcol_df(df, pwd, pws, env->gpr[rt]);
 }
 
 void helper_lsx_vandn_v(CPULoongArchState *env, uint32_t wd, uint32_t ws, uint32_t wt)
@@ -2770,7 +2770,7 @@ void helper_lsx_xvreplve_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
 
-    lsx_xvreplve_df(df, pwd, pws, env->active_tc.gpr[rt]);
+    lsx_xvreplve_df(df, pwd, pws, env->gpr[rt]);
 }
 
 #define CONCATENATE_AND_SLIDE(s, k)             \
@@ -2821,7 +2821,7 @@ void helper_lsx_xvextrcol_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
 
-    lsx_xvextrcol_df(df, pwd, pws, env->active_tc.gpr[rt]);
+    lsx_xvextrcol_df(df, pwd, pws, env->gpr[rt]);
 }
 
 
@@ -16037,7 +16037,7 @@ void helper_lsx_vclrstrr_v(CPULoongArchState *env, uint32_t wd, uint32_t ws, uin
 {
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
-    target_ulong rs = env->active_tc.gpr[wt];
+    target_ulong rs = env->gpr[wt];
 
     int i;
     int m;
@@ -16054,7 +16054,7 @@ void helper_lsx_xvclrstrr_v(CPULoongArchState *env, uint32_t wd, uint32_t ws, ui
 {
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
-    target_ulong rs = env->active_tc.gpr[wt];
+    target_ulong rs = env->gpr[wt];
 
     int i;
     int m;
@@ -17292,7 +17292,7 @@ void helper_lsx_xvhseli_d(CPULoongArchState *env, uint32_t wd, uint32_t ws, uint
 void helper_lsx_xvinsgr2vr_w(CPULoongArchState *env, uint32_t wd, uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 8;
 #if defined(HOST_WORDS_BIGENDIAN)
     if (n < 2) {
@@ -17311,7 +17311,7 @@ void helper_lsx_xvinsgr2vr_w(CPULoongArchState *env, uint32_t wd, uint32_t rs_nu
 void helper_lsx_xvinsgr2vr_d(CPULoongArchState *env, uint32_t wd, uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 4;
     pwd->d[n] = (int64_t)rs;
 }
@@ -17330,13 +17330,13 @@ void helper_lsx_xvpickve2gr_w(CPULoongArchState *env, uint32_t rd, uint32_t ws, 
         n = 14 - n - 1;
     }
 #endif
-    env->active_tc.gpr[rd] = (int32_t)env->fpr[ws].wr.w[n];
+    env->gpr[rd] = (int32_t)env->fpr[ws].wr.w[n];
 }
 
 void helper_lsx_xvpickve2gr_d(CPULoongArchState *env, uint32_t rd, uint32_t ws, uint32_t n)
 {
     n %= 4;
-    env->active_tc.gpr[rd] = (int64_t)env->fpr[ws].wr.d[n];
+    env->gpr[rd] = (int64_t)env->fpr[ws].wr.d[n];
 }
 
 void helper_lsx_xvpickve2gr_wu(CPULoongArchState *env, uint32_t rd, uint32_t ws, uint32_t n)
@@ -17353,7 +17353,7 @@ void helper_lsx_xvpickve2gr_wu(CPULoongArchState *env, uint32_t rd, uint32_t ws,
         n = 14 - n - 1;
     }
 #endif
-    env->active_tc.gpr[rd] = (uint32_t)env->fpr[ws].wr.w[n];
+    env->gpr[rd] = (uint32_t)env->fpr[ws].wr.w[n];
 }
 
 void helper_lsx_xvpickve_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -18217,22 +18217,22 @@ void helper_lsx_vreplgr2vr_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < DF_V_ELEMENTS(DF_BYTE); i++) {
-            pwd->b[i] = (int8_t)env->active_tc.gpr[rs];
+            pwd->b[i] = (int8_t)env->gpr[rs];
         }
         break;
     case DF_HALF:
         for (i = 0; i < DF_V_ELEMENTS(DF_HALF); i++) {
-            pwd->h[i] = (int16_t)env->active_tc.gpr[rs];
+            pwd->h[i] = (int16_t)env->gpr[rs];
         }
         break;
     case DF_WORD:
         for (i = 0; i < DF_V_ELEMENTS(DF_WORD); i++) {
-            pwd->w[i] = (int32_t)env->active_tc.gpr[rs];
+            pwd->w[i] = (int32_t)env->gpr[rs];
         }
         break;
     case DF_DOUBLE:
         for (i = 0; i < DF_V_ELEMENTS(DF_DOUBLE); i++) {
-            pwd->d[i] = (int64_t)env->active_tc.gpr[rs];
+            pwd->d[i] = (int64_t)env->gpr[rs];
         }
        break;
     default:
@@ -18244,7 +18244,7 @@ void helper_lsx_vinsgr2vr_b(CPULoongArchState *env, uint32_t wd,
                           uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 16;
 #if defined(HOST_WORDS_BIGENDIAN)
     if (n < 8) {
@@ -18260,7 +18260,7 @@ void helper_lsx_vinsgr2vr_h(CPULoongArchState *env, uint32_t wd,
                           uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 8;
 #if defined(HOST_WORDS_BIGENDIAN)
     if (n < 4) {
@@ -18276,7 +18276,7 @@ void helper_lsx_vinsgr2vr_w(CPULoongArchState *env, uint32_t wd,
                           uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 4;
 #if defined(HOST_WORDS_BIGENDIAN)
     if (n < 2) {
@@ -18292,7 +18292,7 @@ void helper_lsx_vinsgr2vr_d(CPULoongArchState *env, uint32_t wd,
                           uint32_t rs_num, uint32_t n)
 {
     wr_t *pwd = &(env->fpr[wd].wr);
-    target_ulong rs = env->active_tc.gpr[rs_num];
+    target_ulong rs = env->gpr[rs_num];
     n %= 2;
     pwd->d[n] = (int64_t)rs;
 }
@@ -18301,7 +18301,7 @@ void helper_lsx_vpickve2gr_du(CPULoongArchState *env, uint32_t rd,
                               uint32_t ws, uint32_t n)
 {
     n %= 2;
-    env->active_tc.gpr[rd] = (uint64_t)env->fpr[ws].wr.d[n];
+    env->gpr[rd] = (uint64_t)env->fpr[ws].wr.d[n];
 }
 
 void helper_lsx_vreplvei_df(CPULoongArchState *env, uint32_t df, uint32_t wd,

@@ -228,7 +228,40 @@ struct LoongArchTLB {
     uint64_t tlb_entry0;
     uint64_t tlb_entry1;
 };
+
+
+/* MSA Context */
+#define MSA_WRLEN (128)
+#define LASX_WRLEN (256)
+
+/* LOONGARCH Context */
+#define LASX_WRLEN (256)
+#define LSX_WRLEN (128)
+#define D_WRLEN (64)
+#define W_WRLEN (32)
+#define H_WRLEN (16)
+#define B_WRLEN (8)
+
+#define LASX_REG_WIDTH (256)
+
+#define FP_UNIMPLEMENTED  32
+
+
 typedef struct LoongArchTLB LoongArchTLB;
+
+typedef union wr_t wr_t;
+union wr_t {
+    int8_t  b[MSA_WRLEN / 8];
+    int16_t h[MSA_WRLEN / 16];
+    int32_t w[MSA_WRLEN / 32];
+    int64_t d[MSA_WRLEN / 64];
+    int64_t x[LASX_WRLEN / 64];
+    __int128 q[MSA_WRLEN / 128];
+};
+typedef union lasx_reg_t lasx_reg_t;
+union lasx_reg_t {
+    int64_t val64[LASX_REG_WIDTH / 64];
+};
 
 typedef union fpr_t fpr_t;
 union fpr_t {
@@ -240,6 +273,17 @@ union fpr_t {
     lasx_reg_t lasx; /* vector data */
     wr_t  wr;
 };
+
+#define MSACSR_FS       24
+#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+#define MSACSR_NX       18
+#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+#define MSACSR_CEF      2
+#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+#define MSACSR_RM       0
+#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK | MSACSR_NX_MASK | \
+        MSACSR_FS_MASK)
 
 typedef struct CPUArchState {
     uint64_t gpr[32];
