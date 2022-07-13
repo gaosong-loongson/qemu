@@ -230,11 +230,22 @@ struct LoongArchTLB {
 };
 typedef struct LoongArchTLB LoongArchTLB;
 
+typedef union fpr_t fpr_t;
+union fpr_t {
+    float64  fd;   /* ieee double precision */
+    float32  fs[2];/* ieee single precision */
+    uint64_t d;    /* binary double fixed-point */
+    uint32_t w[2]; /* binary single fixed-point */
+/* FPU/LASX register mapping is not tested on big-endian hosts. */
+    lasx_reg_t lasx; /* vector data */
+    wr_t  wr;
+};
+
 typedef struct CPUArchState {
     uint64_t gpr[32];
     uint64_t pc;
 
-    uint64_t fpr[32];
+    fpr_t fpr[32];
     float_status fp_status;
     bool cf[8];
 
