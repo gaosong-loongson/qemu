@@ -18334,113 +18334,112 @@ void helper_lsx_vextrcoli_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 void helper_lsx_vseteqz_v(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->q[0] == 0);
+    env->cf[cd & 0x7] = (pws->q[0] == 0);
 }
 
 void helper_lsx_vsetnez_v(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->q[0] != 0);
+    env->cf[cd & 0x7] = (pws->q[0] != 0);
 }
 
 void helper_lsx_vsetanyeqz_b(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->b[0] == 0) ||
-                                   (pws->b[1] == 0) ||
-                                   (pws->b[2] == 0) ||
-                                   (pws->b[3] == 0) ||
-                                   (pws->b[4] == 0) ||
-                                   (pws->b[5] == 0) ||
-                                   (pws->b[6] == 0) ||
-                                   (pws->b[7] == 0) ||
-                                   (pws->b[8] == 0) ||
-                                   (pws->b[9] == 0) ||
-                                   (pws->b[10] == 0) ||
-                                   (pws->b[11] == 0) ||
-                                   (pws->b[12] == 0) ||
-                                   (pws->b[13] == 0) ||
-                                   (pws->b[14] == 0) ||
-                                   (pws->b[15] == 0) ;
+    env->cf[cd & 0x7] = (pws->b[0] == 0) ||
+                        (pws->b[1] == 0) ||
+                        (pws->b[2] == 0) ||
+                        (pws->b[3] == 0) ||
+                        (pws->b[4] == 0) ||
+                        (pws->b[5] == 0) ||
+                        (pws->b[6] == 0) ||
+                        (pws->b[7] == 0) ||
+                        (pws->b[8] == 0) ||
+                        (pws->b[9] == 0) ||
+                        (pws->b[10] == 0) ||
+                        (pws->b[11] == 0) ||
+                        (pws->b[12] == 0) ||
+                        (pws->b[13] == 0) ||
+                        (pws->b[14] == 0) ||
+                        (pws->b[15] == 0) ;
 }
 
 void helper_lsx_vsetanyeqz_h(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->h[0] == 0) ||
-                                   (pws->h[1] == 0) ||
-                                   (pws->h[2] == 0) ||
-                                   (pws->h[3] == 0) ||
-                                   (pws->h[4] == 0) ||
-                                   (pws->h[5] == 0) ||
-                                   (pws->h[6] == 0) ||
-                                   (pws->h[7] == 0) ;
+    env->cf[cd & 0x7] = (pws->h[0] == 0) ||
+                        (pws->h[1] == 0) ||
+                        (pws->h[2] == 0) ||
+                        (pws->h[3] == 0) ||
+                        (pws->h[4] == 0) ||
+                        (pws->h[5] == 0) ||
+                        (pws->h[6] == 0) ||
+                        (pws->h[7] == 0) ;
 }
 
 void helper_lsx_vsetanyeqz_w(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->w[0] == 0) ||
-                                   (pws->w[1] == 0) ||
-                                   (pws->w[2] == 0) ||
-                                   (pws->w[3] == 0) ;
+    env->cf[cd & 0x7] = (pws->w[0] == 0) ||
+                        (pws->w[1] == 0) ||
+                        (pws->w[2] == 0) ||
+                        (pws->w[3] == 0) ;
 }
 
 void helper_lsx_vsetanyeqz_d(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->d[0] == 0) ||
+    env->cf[cd & 0x7] = (pws->d[0] == 0) ||
                                    (pws->d[1] == 0) ;
 }
 
 void helper_lsx_vsetallnez_b(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->b[0] != 0) &&
-                                   (pws->b[1] != 0) &&
-                                   (pws->b[2] != 0) &&
-                                   (pws->b[3] != 0) &&
-                                   (pws->b[4] != 0) &&
-                                   (pws->b[5] != 0) &&
-                                   (pws->b[6] != 0) &&
-                                   (pws->b[7] != 0) &&
-                                   (pws->b[8] != 0) &&
-                                   (pws->b[9] != 0) &&
-                                   (pws->b[10] != 0) &&
-                                   (pws->b[11] != 0) &&
-                                   (pws->b[12] != 0) &&
-                                   (pws->b[13] != 0) &&
-                                   (pws->b[14] != 0) &&
-                                   (pws->b[15] != 0) ;
+    env->cf[cd & 0x7] = (pws->b[0] != 0) &&
+                        (pws->b[1] != 0) &&
+                        (pws->b[2] != 0) &&
+                        (pws->b[3] != 0) &&
+                        (pws->b[4] != 0) &&
+                        (pws->b[5] != 0) &&
+                        (pws->b[6] != 0) &&
+                        (pws->b[7] != 0) &&
+                        (pws->b[8] != 0) &&
+                        (pws->b[9] != 0) &&
+                        (pws->b[10] != 0) &&
+                        (pws->b[11] != 0) &&
+                        (pws->b[12] != 0) &&
+                        (pws->b[13] != 0) &&
+                        (pws->b[14] != 0) &&
+                        (pws->b[15] != 0) ;
 }
 
 void helper_lsx_vsetallnez_h(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->h[0] != 0) &&
-                                   (pws->h[1] != 0) &&
-                                   (pws->h[2] != 0) &&
-                                   (pws->h[3] != 0) &&
-                                   (pws->h[4] != 0) &&
-                                   (pws->h[5] != 0) &&
-                                   (pws->h[6] != 0) &&
-                                   (pws->h[7] != 0) ;
+    env->cf[cd & 0x7] = (pws->h[0] != 0) &&
+                        (pws->h[1] != 0) &&
+                        (pws->h[2] != 0) &&
+                        (pws->h[3] != 0) &&
+                        (pws->h[4] != 0) &&
+                        (pws->h[5] != 0) &&
+                        (pws->h[6] != 0) &&
+                        (pws->h[7] != 0) ;
 }
 
 void helper_lsx_vsetallnez_w(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->w[0] != 0) &&
-                                   (pws->w[1] != 0) &&
-                                   (pws->w[2] != 0) &&
-                                   (pws->w[3] != 0) ;
+    env->cf[cd & 0x7] = (pws->w[0] != 0) &&
+                        (pws->w[1] != 0) &&
+                        (pws->w[2] != 0) &&
+                        (pws->w[3] != 0) ;
 }
 
 void helper_lsx_vsetallnez_d(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->d[0] != 0) &&
-                                   (pws->d[1] != 0) ;
+    env->cf[cd & 0x7] = (pws->d[0] != 0) && (pws->d[1] != 0);
 }
 
 static inline int64_t lsx_vbitclr_df(uint32_t df, int64_t arg1, int64_t arg2)
@@ -19302,173 +19301,173 @@ void helper_lsx_xvmskfill_b(CPULoongArchState *env, uint32_t wd, uint32_t ws)
 void helper_lsx_xvseteqz_v(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->q[0] == 0 && pws->q[1] == 0);
+    env->cf[cd & 0x7] = (pws->q[0] == 0 && pws->q[1] == 0);
 }
 
 void helper_lsx_xvsetnez_v(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->q[0] != 0 || pws->q[1] != 0);
+    env->cf[cd & 0x7] = (pws->q[0] != 0 || pws->q[1] != 0);
 }
 
 void helper_lsx_xvsetanyeqz_b(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->b[0]  == 0) ||
-                                   (pws->b[1]  == 0) ||
-                                   (pws->b[2]  == 0) ||
-                                   (pws->b[3]  == 0) ||
-                                   (pws->b[4]  == 0) ||
-                                   (pws->b[5]  == 0) ||
-                                   (pws->b[6]  == 0) ||
-                                   (pws->b[7]  == 0) ||
-                                   (pws->b[8]  == 0) ||
-                                   (pws->b[9]  == 0) ||
-                                   (pws->b[10] == 0) ||
-                                   (pws->b[11] == 0) ||
-                                   (pws->b[12] == 0) ||
-                                   (pws->b[13] == 0) ||
-                                   (pws->b[14] == 0) ||
-                                   (pws->b[15] == 0) ||
-                                   (pws->b[16] == 0) ||
-                                   (pws->b[17] == 0) ||
-                                   (pws->b[18] == 0) ||
-                                   (pws->b[19] == 0) ||
-                                   (pws->b[20] == 0) ||
-                                   (pws->b[21] == 0) ||
-                                   (pws->b[22] == 0) ||
-                                   (pws->b[23] == 0) ||
-                                   (pws->b[24] == 0) ||
-                                   (pws->b[25] == 0) ||
-                                   (pws->b[26] == 0) ||
-                                   (pws->b[27] == 0) ||
-                                   (pws->b[28] == 0) ||
-                                   (pws->b[29] == 0) ||
-                                   (pws->b[30] == 0) ||
-                                   (pws->b[31] == 0) ;
+    env->cf[cd & 0x7] = (pws->b[0]  == 0) ||
+                        (pws->b[1]  == 0) ||
+                        (pws->b[2]  == 0) ||
+                        (pws->b[3]  == 0) ||
+                        (pws->b[4]  == 0) ||
+                        (pws->b[5]  == 0) ||
+                        (pws->b[6]  == 0) ||
+                        (pws->b[7]  == 0) ||
+                        (pws->b[8]  == 0) ||
+                        (pws->b[9]  == 0) ||
+                        (pws->b[10] == 0) ||
+                        (pws->b[11] == 0) ||
+                        (pws->b[12] == 0) ||
+                        (pws->b[13] == 0) ||
+                        (pws->b[14] == 0) ||
+                        (pws->b[15] == 0) ||
+                        (pws->b[16] == 0) ||
+                        (pws->b[17] == 0) ||
+                        (pws->b[18] == 0) ||
+                        (pws->b[19] == 0) ||
+                        (pws->b[20] == 0) ||
+                        (pws->b[21] == 0) ||
+                        (pws->b[22] == 0) ||
+                        (pws->b[23] == 0) ||
+                        (pws->b[24] == 0) ||
+                        (pws->b[25] == 0) ||
+                        (pws->b[26] == 0) ||
+                        (pws->b[27] == 0) ||
+                        (pws->b[28] == 0) ||
+                        (pws->b[29] == 0) ||
+                        (pws->b[30] == 0) ||
+                        (pws->b[31] == 0) ;
 }
 
 void helper_lsx_xvsetanyeqz_h(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->h[0]  == 0) ||
-                                   (pws->h[1]  == 0) ||
-                                   (pws->h[2]  == 0) ||
-                                   (pws->h[3]  == 0) ||
-                                   (pws->h[4]  == 0) ||
-                                   (pws->h[5]  == 0) ||
-                                   (pws->h[6]  == 0) ||
-                                   (pws->h[7]  == 0) ||
-                                   (pws->h[8]  == 0) ||
-                                   (pws->h[9]  == 0) ||
-                                   (pws->h[10] == 0) ||
-                                   (pws->h[11] == 0) ||
-                                   (pws->h[12] == 0) ||
-                                   (pws->h[13] == 0) ||
-                                   (pws->h[14] == 0) ||
-                                   (pws->h[15] == 0) ;
+    env->cf[cd & 0x7] = (pws->h[0]  == 0) ||
+                        (pws->h[1]  == 0) ||
+                        (pws->h[2]  == 0) ||
+                        (pws->h[3]  == 0) ||
+                        (pws->h[4]  == 0) ||
+                        (pws->h[5]  == 0) ||
+                        (pws->h[6]  == 0) ||
+                        (pws->h[7]  == 0) ||
+                        (pws->h[8]  == 0) ||
+                        (pws->h[9]  == 0) ||
+                        (pws->h[10] == 0) ||
+                        (pws->h[11] == 0) ||
+                        (pws->h[12] == 0) ||
+                        (pws->h[13] == 0) ||
+                        (pws->h[14] == 0) ||
+                        (pws->h[15] == 0) ;
 }
 
 void helper_lsx_xvsetanyeqz_w(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->w[0] == 0) ||
-                                   (pws->w[1] == 0) ||
-                                   (pws->w[2] == 0) ||
-                                   (pws->w[3] == 0) ||
-                                   (pws->w[4] == 0) ||
-                                   (pws->w[5] == 0) ||
-                                   (pws->w[6] == 0) ||
-                                   (pws->w[7] == 0) ;
+    env->cf[cd & 0x7] = (pws->w[0] == 0) ||
+                        (pws->w[1] == 0) ||
+                        (pws->w[2] == 0) ||
+                        (pws->w[3] == 0) ||
+                        (pws->w[4] == 0) ||
+                        (pws->w[5] == 0) ||
+                        (pws->w[6] == 0) ||
+                        (pws->w[7] == 0) ;
 }
 
 void helper_lsx_xvsetanyeqz_d(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->d[0] == 0) ||
-                                   (pws->d[1] == 0) ||
-                                   (pws->d[2] == 0) ||
-                                   (pws->d[3] == 0) ;
+    env->cf[cd & 0x7] = (pws->d[0] == 0) ||
+                        (pws->d[1] == 0) ||
+                        (pws->d[2] == 0) ||
+                        (pws->d[3] == 0) ;
 }
 
 void helper_lsx_xvsetallnez_b(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->b[0]  != 0) &&
-                                   (pws->b[1]  != 0) &&
-                                   (pws->b[2]  != 0) &&
-                                   (pws->b[3]  != 0) &&
-                                   (pws->b[4]  != 0) &&
-                                   (pws->b[5]  != 0) &&
-                                   (pws->b[6]  != 0) &&
-                                   (pws->b[7]  != 0) &&
-                                   (pws->b[8]  != 0) &&
-                                   (pws->b[9]  != 0) &&
-                                   (pws->b[10] != 0) &&
-                                   (pws->b[11] != 0) &&
-                                   (pws->b[12] != 0) &&
-                                   (pws->b[13] != 0) &&
-                                   (pws->b[14] != 0) &&
-                                   (pws->b[15] != 0) &&
-                                   (pws->b[16] != 0) &&
-                                   (pws->b[17] != 0) &&
-                                   (pws->b[18] != 0) &&
-                                   (pws->b[19] != 0) &&
-                                   (pws->b[20] != 0) &&
-                                   (pws->b[21] != 0) &&
-                                   (pws->b[22] != 0) &&
-                                   (pws->b[23] != 0) &&
-                                   (pws->b[24] != 0) &&
-                                   (pws->b[25] != 0) &&
-                                   (pws->b[26] != 0) &&
-                                   (pws->b[27] != 0) &&
-                                   (pws->b[28] != 0) &&
-                                   (pws->b[29] != 0) &&
-                                   (pws->b[30] != 0) &&
-                                   (pws->b[31] != 0) ;
+    env->cf[cd & 0x7] = (pws->b[0]  != 0) &&
+                        (pws->b[1]  != 0) &&
+                        (pws->b[2]  != 0) &&
+                        (pws->b[3]  != 0) &&
+                        (pws->b[4]  != 0) &&
+                        (pws->b[5]  != 0) &&
+                        (pws->b[6]  != 0) &&
+                        (pws->b[7]  != 0) &&
+                        (pws->b[8]  != 0) &&
+                        (pws->b[9]  != 0) &&
+                        (pws->b[10] != 0) &&
+                        (pws->b[11] != 0) &&
+                        (pws->b[12] != 0) &&
+                        (pws->b[13] != 0) &&
+                        (pws->b[14] != 0) &&
+                        (pws->b[15] != 0) &&
+                        (pws->b[16] != 0) &&
+                        (pws->b[17] != 0) &&
+                        (pws->b[18] != 0) &&
+                        (pws->b[19] != 0) &&
+                        (pws->b[20] != 0) &&
+                        (pws->b[21] != 0) &&
+                        (pws->b[22] != 0) &&
+                        (pws->b[23] != 0) &&
+                        (pws->b[24] != 0) &&
+                        (pws->b[25] != 0) &&
+                        (pws->b[26] != 0) &&
+                        (pws->b[27] != 0) &&
+                        (pws->b[28] != 0) &&
+                        (pws->b[29] != 0) &&
+                        (pws->b[30] != 0) &&
+                        (pws->b[31] != 0) ;
 }
 
 void helper_lsx_xvsetallnez_h(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->h[0]  != 0) &&
-                                   (pws->h[1]  != 0) &&
-                                   (pws->h[2]  != 0) &&
-                                   (pws->h[3]  != 0) &&
-                                   (pws->h[4]  != 0) &&
-                                   (pws->h[5]  != 0) &&
-                                   (pws->h[6]  != 0) &&
-                                   (pws->h[7]  != 0) &&
-                                   (pws->h[8]  != 0) &&
-                                   (pws->h[9]  != 0) &&
-                                   (pws->h[10] != 0) &&
-                                   (pws->h[11] != 0) &&
-                                   (pws->h[12] != 0) &&
-                                   (pws->h[13] != 0) &&
-                                   (pws->h[14] != 0) &&
-                                   (pws->h[15] != 0) ;
+    env->cf[cd & 0x7] = (pws->h[0]  != 0) &&
+                        (pws->h[1]  != 0) &&
+                        (pws->h[2]  != 0) &&
+                        (pws->h[3]  != 0) &&
+                        (pws->h[4]  != 0) &&
+                        (pws->h[5]  != 0) &&
+                        (pws->h[6]  != 0) &&
+                        (pws->h[7]  != 0) &&
+                        (pws->h[8]  != 0) &&
+                        (pws->h[9]  != 0) &&
+                        (pws->h[10] != 0) &&
+                        (pws->h[11] != 0) &&
+                        (pws->h[12] != 0) &&
+                        (pws->h[13] != 0) &&
+                        (pws->h[14] != 0) &&
+                        (pws->h[15] != 0) ;
 }
 
 void helper_lsx_xvsetallnez_w(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->w[0] != 0) &&
-                                   (pws->w[1] != 0) &&
-                                   (pws->w[2] != 0) &&
-                                   (pws->w[3] != 0) &&
-                                   (pws->w[4] != 0) &&
-                                   (pws->w[5] != 0) &&
-                                   (pws->w[6] != 0) &&
-                                   (pws->w[7] != 0) ;
+    env->cf[cd & 0x7] = (pws->w[0] != 0) &&
+                        (pws->w[1] != 0) &&
+                        (pws->w[2] != 0) &&
+                        (pws->w[3] != 0) &&
+                        (pws->w[4] != 0) &&
+                        (pws->w[5] != 0) &&
+                        (pws->w[6] != 0) &&
+                        (pws->w[7] != 0) ;
 }
 
 void helper_lsx_xvsetallnez_d(CPULoongArchState *env, uint32_t cd, uint32_t ws)
 {
     wr_t *pws = &(env->fpr[ws].wr);
-    env->active_fpu.cf[cd & 0x7] = (pws->d[0] != 0) &&
-                                   (pws->d[1] != 0) &&
-                                   (pws->d[2] != 0) &&
-                                   (pws->d[3] != 0) ;
+    env->cf[cd & 0x7] = (pws->d[0] != 0) &&
+                        (pws->d[1] != 0) &&
+                        (pws->d[2] != 0) &&
+                        (pws->d[3] != 0) ;
 }
 
 #define LSX_XBINOP_IMMU_DF(helper, func)                                  \
