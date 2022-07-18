@@ -51,6 +51,8 @@ static const char * const excp_names[] = {
     [EXCCODE_FPE] = "Floating Point Exception",
     [EXCCODE_DBP] = "Debug breakpoint",
     [EXCCODE_BCE] = "Bound Check Exception",
+    [EXCCODE_SXD] = "128 bit vector instructions Disable exception",
+    [EXCCODE_ASXD] = "256 bit vector instructions Disable exception",
 };
 
 const char *loongarch_exception_name(int32_t exception)

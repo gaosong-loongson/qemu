@@ -1,3 +1,19 @@
+static inline void check_lsx_enabled(DisasContext *ctx)
+{
+#ifndef CONFIG_USER_ONLY
+    //check cpucfg or csr wether supported LSX
+    //generate_exception(ctx, EXCCODE_SXD);
+#endif
+}
+
+static inline void check_lasx_enabled(DisasContext *ctx)
+{
+#ifndef CONFIG_USER_ONLY
+    //check cpucfg or csr wether supported LASX
+    //generate_exception(ctx, EXCCODE_ASXD)
+#endif
+}
+
 static bool trans_vseq_b(DisasContext *ctx, arg_vseq_b *a)
 {
     TCGv_i32 twd = tcg_const_i32(a->vd);
