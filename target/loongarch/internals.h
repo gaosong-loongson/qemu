@@ -13,6 +13,14 @@
 #define FCMP_UN   0b0100  /* unordered */
 #define FCMP_GT   0b1000  /* fp0 > fp1 */
 
+enum CPULSXDataFormat {
+    DF_BYTE = 0,
+    DF_HALF,
+    DF_WORD,
+    DF_DOUBLE,
+    DF_QUAD
+};
+
 #define TARGET_PHYS_MASK MAKE_64BIT_MASK(0, TARGET_PHYS_ADDR_SPACE_BITS)
 #define TARGET_VIRT_MASK MAKE_64BIT_MASK(0, TARGET_VIRT_ADDR_SPACE_BITS)
 
