@@ -9040,6 +9040,95 @@ TRANS_XVFMA(xvfnmsub_s)   // trans_xvfnmsub_s
 TRANS_XVFMA(xvfnmsub_d)   // trans_xvfnmsub_d
 #undef TRANS_XVFMA
 
+#define VOP_CONDNS(fmt, ifmt)                                           \
+static inline void gen_vfcmp_ ## fmt(DisasContext *ctx, int n,          \
+                                      int vk, int vj, int vd)           \
+{                                                                       \
+    TCGv_i32 twd = tcg_const_i32(vd);                                   \
+    TCGv_i32 tws = tcg_const_i32(vj);                                   \
+    TCGv_i32 twt = tcg_const_i32(vk);                                   \
+    TCGv_i32 tdf = tcg_const_i32(DF_ ## ifmt);                          \
+    switch (n) {                                                        \
+    case  0:                                                            \
+        gen_helper_msa_fcaf_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  1:                                                            \
+        gen_helper_msa_fsaf_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  2:                                                            \
+        gen_helper_msa_fclt_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  3:                                                            \
+        gen_helper_msa_fslt_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  4:                                                            \
+        gen_helper_msa_fceq_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  5:                                                            \
+        gen_helper_msa_fseq_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  6:                                                            \
+        gen_helper_msa_fcle_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  7:                                                            \
+        gen_helper_msa_fsle_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  8:                                                            \
+        gen_helper_msa_fcun_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case  9:                                                            \
+        gen_helper_msa_fsun_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case 10:                                                            \
+        gen_helper_msa_fcult_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 11:                                                            \
+        gen_helper_msa_fsult_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 12:                                                            \
+        gen_helper_msa_fcueq_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 13:                                                            \
+        gen_helper_msa_fsueq_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 14:                                                            \
+        gen_helper_msa_fcule_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 15:                                                            \
+        gen_helper_msa_fsule_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 16:                                                            \
+        gen_helper_msa_fcne_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case 17:                                                            \
+        gen_helper_msa_fsne_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case 20:                                                            \
+        gen_helper_msa_fcor_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case 21:                                                            \
+        gen_helper_msa_fsor_df(cpu_env, tdf, twd, tws, twt);            \
+        break;                                                          \
+    case 24:                                                            \
+        gen_helper_msa_fcune_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    case 25:                                                            \
+        gen_helper_msa_fsune_df(cpu_env, tdf, twd, tws, twt);           \
+        break;                                                          \
+    default:                                                            \
+        abort();                                                        \
+    }                                                                   \
+    tcg_temp_free_i32(twd);                                             \
+    tcg_temp_free_i32(tws);                                             \
+    tcg_temp_free_i32(twt);                                             \
+    tcg_temp_free_i32(tdf);                                             \
+}
+
+VOP_CONDNS(s, WORD)
+VOP_CONDNS(d, DOUBLE)
+#undef VOP_CONDNS
+
+
 static bool trans_vfcmp_cond_s(DisasContext *ctx, arg_vfcmp_cond_s *a)
 {
     check_lsx_enabled(ctx);
@@ -9519,6 +9608,42 @@ static bool trans_vsigncov_d(DisasContext *ctx, arg_vsigncov_d *a)
     tcg_temp_free_i32(twt);
     return true;
 }
+
+static inline void gen_load_gpr(TCGv t, int reg)
+{
+    if (reg == 0) {
+        tcg_gen_movi_tl(t, 0);
+    } else {
+        tcg_gen_mov_tl(t, cpu_gpr[reg]);
+    }
+}
+
+/* Addresses computation */
+static inline void gen_op_addr_add(DisasContext *ctx,
+                                   TCGv ret, TCGv arg0, TCGv arg1)
+{
+    tcg_gen_add_tl(ret, arg0, arg1);
+
+//    if (ctx->hflags & LARCH_HFLAG_AWRAP) {
+        tcg_gen_ext32s_i64(ret, ret);
+//    }
+}
+
+
+static void gen_base_offset_addr(DisasContext *ctx, TCGv addr,
+                                 int base, int offset)
+{
+    if (base == 0) {
+        tcg_gen_movi_tl(addr, offset);
+    } else if (offset == 0) {
+        gen_load_gpr(addr, base);
+    } else {
+        tcg_gen_movi_tl(addr, offset);
+        gen_op_addr_add(ctx, addr, cpu_gpr[base], addr);
+    }
+}
+
+
 
 static bool trans_vld(DisasContext *ctx, arg_vld *a)
 {
