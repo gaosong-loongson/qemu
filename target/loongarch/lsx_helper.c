@@ -2144,36 +2144,6 @@ void helper_lsx_xvpackev_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        for (i = 0; i < (256/16); i++) {
-            pwd->b[2*i+1] = pws->b[2*i+1];
-            pwd->b[2*i]   = pwt->b[2*i+1];
-        }
-        break;
-    case DF_HALF:
-        for (i = 0; i < (256/32); i++) {
-            pwd->h[2*i+1] = pws->h[2*i+1];
-            pwd->h[2*i]   = pwt->h[2*i+1];
-        }
-        break;
-    case DF_WORD:
-        for (i = 0; i < (256/64); i++) {
-            pwd->w[2*i+1] = pws->w[2*i+1];
-            pwd->w[2*i]   = pwt->w[2*i+1];
-        }
-        break;
-    case DF_DOUBLE:
-        for (i = 0; i < (256/128); i++) {
-            pwd->d[2*i+1] = pws->d[2*i+1];
-            pwd->d[2*i]   = pwt->d[2*i+1];
-        }
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2202,7 +2172,6 @@ void helper_lsx_xvpackev_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 void helper_lsx_xvpackod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -2214,36 +2183,6 @@ void helper_lsx_xvpackod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        for (i = 0; i < (256/16); i++) {
-            pwd->b[2*i+1] = pws->b[2*i];
-            pwd->b[2*i]   = pwt->b[2*i];
-        }
-        break;
-    case DF_HALF:
-        for (i = 0; i < (256/32); i++) {
-            pwd->h[2*i+1] = pws->h[2*i];
-            pwd->h[2*i]   = pwt->h[2*i];
-        }
-        break;
-    case DF_WORD:
-        for (i = 0; i < (256/64); i++) {
-            pwd->w[2*i+1] = pws->w[2*i];
-            pwd->w[2*i]   = pwt->w[2*i];
-        }
-        break;
-    case DF_DOUBLE:
-        for (i = 0; i < (256/128); i++) {
-            pwd->d[2*i+1] = pws->d[2*i];
-            pwd->d[2*i]   = pwt->d[2*i];
-        }
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2272,7 +2211,6 @@ void helper_lsx_xvpackod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 void helper_lsx_xvilvl_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -2284,80 +2222,6 @@ void helper_lsx_xvilvl_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        pwd->b[24] = pws->b[0];
-        pwd->b[25] = pwt->b[0];
-        pwd->b[26] = pws->b[1];
-        pwd->b[27] = pwt->b[1];
-        pwd->b[28] = pws->b[2];
-        pwd->b[29] = pwt->b[2];
-        pwd->b[30] = pws->b[3];
-        pwd->b[31] = pwt->b[3];
-        pwd->b[16] = pws->b[4];
-        pwd->b[17] = pwt->b[4];
-        pwd->b[18] = pws->b[5];
-        pwd->b[19] = pwt->b[5];
-        pwd->b[20] = pws->b[6];
-        pwd->b[21] = pwt->b[6];
-        pwd->b[22] = pws->b[7];
-        pwd->b[23] = pwt->b[7];
-        pwd->b[8]  = pws->b[8];
-        pwd->b[9]  = pwt->b[8];
-        pwd->b[10] = pws->b[9];
-        pwd->b[11] = pwt->b[9];
-        pwd->b[12] = pws->b[10];
-        pwd->b[13] = pwt->b[10];
-        pwd->b[14] = pws->b[11];
-        pwd->b[15] = pwt->b[11];
-        pwd->b[0]  = pws->b[12];
-        pwd->b[1]  = pwt->b[12];
-        pwd->b[2]  = pws->b[13];
-        pwd->b[3]  = pwt->b[13];
-        pwd->b[4]  = pws->b[14];
-        pwd->b[5]  = pwt->b[14];
-        pwd->b[6]  = pws->b[15];
-        pwd->b[7]  = pwt->b[15];
-        break;
-    case DF_HALF:
-        pwd->h[12] = pws->h[0];
-        pwd->h[13] = pwt->h[0];
-        pwd->h[14] = pws->h[1];
-        pwd->h[15] = pwt->h[1];
-        pwd->h[8]  = pws->h[2];
-        pwd->h[9]  = pwt->h[2];
-        pwd->h[10] = pws->h[3];
-        pwd->h[11] = pwt->h[3];
-        pwd->h[4]  = pws->h[4];
-        pwd->h[5]  = pwt->h[4];
-        pwd->h[6]  = pws->h[5];
-        pwd->h[7]  = pwt->h[5];
-        pwd->h[0]  = pws->h[6];
-        pwd->h[1]  = pwt->h[6];
-        pwd->h[2]  = pws->h[7];
-        pwd->h[3]  = pwt->h[7];
-        break;
-    case DF_WORD:
-        pwd->w[6] = pws->w[0];
-        pwd->w[7] = pwt->w[0];
-        pwd->w[4] = pws->w[1];
-        pwd->w[5] = pwt->w[1];
-        pwd->w[2] = pws->w[2];
-        pwd->w[3] = pwt->w[2];
-        pwd->w[0] = pws->w[3];
-        pwd->w[1] = pwt->w[3];
-        break;
-    case DF_DOUBLE:
-        pwd->d[2] = pws->d[0];
-        pwd->d[3] = pwt->d[0];
-        pwd->d[0] = pws->d[1];
-        pwd->d[1] = pwt->d[1];
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2386,7 +2250,6 @@ void helper_lsx_xvilvl_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 void helper_lsx_xvilvh_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -2398,80 +2261,6 @@ void helper_lsx_xvilvh_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        pwd->b[24] = pws->b[16];
-        pwd->b[25] = pwt->b[16];
-        pwd->b[26] = pws->b[17];
-        pwd->b[27] = pwt->b[17];
-        pwd->b[28] = pws->b[18];
-        pwd->b[29] = pwt->b[18];
-        pwd->b[30] = pws->b[19];
-        pwd->b[31] = pwt->b[19];
-        pwd->b[16] = pws->b[20];
-        pwd->b[17] = pwt->b[20];
-        pwd->b[18] = pws->b[21];
-        pwd->b[19] = pwt->b[21];
-        pwd->b[20] = pws->b[22];
-        pwd->b[21] = pwt->b[22];
-        pwd->b[22] = pws->b[23];
-        pwd->b[23] = pwt->b[23];
-        pwd->b[8]  = pws->b[24];
-        pwd->b[9]  = pwt->b[24];
-        pwd->b[10] = pws->b[25];
-        pwd->b[11] = pwt->b[25];
-        pwd->b[12] = pws->b[26];
-        pwd->b[13] = pwt->b[26];
-        pwd->b[14] = pws->b[27];
-        pwd->b[15] = pwt->b[27];
-        pwd->b[0]  = pws->b[28];
-        pwd->b[1]  = pwt->b[28];
-        pwd->b[2]  = pws->b[29];
-        pwd->b[3]  = pwt->b[29];
-        pwd->b[4]  = pws->b[30];
-        pwd->b[5]  = pwt->b[30];
-        pwd->b[6]  = pws->b[31];
-        pwd->b[7]  = pwt->b[31];
-        break;
-    case DF_HALF:
-        pwd->h[12] = pws->h[8];
-        pwd->h[13] = pwt->h[8];
-        pwd->h[14] = pws->h[9];
-        pwd->h[15] = pwt->h[9];
-        pwd->h[8]  = pws->h[10];
-        pwd->h[9]  = pwt->h[10];
-        pwd->h[10] = pws->h[11];
-        pwd->h[11] = pwt->h[11];
-        pwd->h[4]  = pws->h[12];
-        pwd->h[5]  = pwt->h[12];
-        pwd->h[6]  = pws->h[13];
-        pwd->h[7]  = pwt->h[13];
-        pwd->h[0]  = pws->h[14];
-        pwd->h[1]  = pwt->h[14];
-        pwd->h[2]  = pws->h[15];
-        pwd->h[3]  = pwt->h[15];
-        break;
-    case DF_WORD:
-        pwd->w[6] = pws->w[4];
-        pwd->w[7] = pwt->w[4];
-        pwd->w[4] = pws->w[5];
-        pwd->w[5] = pwt->w[5];
-        pwd->w[2] = pws->w[6];
-        pwd->w[3] = pwt->w[6];
-        pwd->w[0] = pws->w[7];
-        pwd->w[1] = pwt->w[7];
-        break;
-    case DF_DOUBLE:
-        pwd->d[2] = pws->d[2];
-        pwd->d[3] = pwt->d[2];
-        pwd->d[0] = pws->d[3];
-        pwd->d[1] = pwt->d[3];
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2500,7 +2289,6 @@ void helper_lsx_xvilvh_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 void helper_lsx_xvpickev_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -2512,80 +2300,6 @@ void helper_lsx_xvpickev_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        pwd->b[24] = pws->b[9];
-        pwd->b[25] = pws->b[11];
-        pwd->b[26] = pws->b[13];
-        pwd->b[27] = pws->b[15];
-        pwd->b[28] = pws->b[1];
-        pwd->b[29] = pws->b[3];
-        pwd->b[30] = pws->b[5];
-        pwd->b[31] = pws->b[7];
-        pwd->b[16] = pws->b[25];
-        pwd->b[17] = pws->b[27];
-        pwd->b[18] = pws->b[29];
-        pwd->b[19] = pws->b[31];
-        pwd->b[20] = pws->b[17];
-        pwd->b[21] = pws->b[19];
-        pwd->b[22] = pws->b[21];
-        pwd->b[23] = pws->b[23];
-        pwd->b[8]  = pwt->b[9];
-        pwd->b[9]  = pwt->b[11];
-        pwd->b[10] = pwt->b[13];
-        pwd->b[11] = pwt->b[15];
-        pwd->b[12] = pwt->b[1];
-        pwd->b[13] = pwt->b[3];
-        pwd->b[14] = pwt->b[5];
-        pwd->b[15] = pwt->b[7];
-        pwd->b[0]  = pwt->b[25];
-        pwd->b[1]  = pwt->b[27];
-        pwd->b[2]  = pwt->b[29];
-        pwd->b[3]  = pwt->b[31];
-        pwd->b[4]  = pwt->b[17];
-        pwd->b[5]  = pwt->b[19];
-        pwd->b[6]  = pwt->b[21];
-        pwd->b[7]  = pwt->b[23];
-        break;
-    case DF_HALF:
-        pwd->h[12] = pws->h[5];
-        pwd->h[13] = pws->h[7];
-        pwd->h[14] = pws->h[1];
-        pwd->h[15] = pws->h[3];
-        pwd->h[8]  = pws->h[13];
-        pwd->h[9]  = pws->h[15];
-        pwd->h[10] = pws->h[9];
-        pwd->h[11] = pws->h[11];
-        pwd->h[4]  = pwt->h[5];
-        pwd->h[5]  = pwt->h[7];
-        pwd->h[6]  = pwt->h[1];
-        pwd->h[7]  = pwt->h[3];
-        pwd->h[0]  = pwt->h[13];
-        pwd->h[1]  = pwt->h[15];
-        pwd->h[2]  = pwt->h[9];
-        pwd->h[3]  = pwt->h[11];
-        break;
-    case DF_WORD:
-        pwd->w[6] = pws->w[3];
-        pwd->w[7] = pws->w[1];
-        pwd->w[4] = pws->w[7];
-        pwd->w[5] = pws->w[5];
-        pwd->w[2] = pwt->w[3];
-        pwd->w[3] = pwt->w[1];
-        pwd->w[0] = pwt->w[7];
-        pwd->w[1] = pwt->w[5];
-        break;
-    case DF_DOUBLE:
-        pwd->d[2] = pws->d[3];
-        pwd->d[3] = pws->d[1];
-        pwd->d[0] = pwt->d[3];
-        pwd->d[1] = pwt->d[1];
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2614,7 +2328,6 @@ void helper_lsx_xvpickev_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 void helper_lsx_xvpickod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
@@ -2626,80 +2339,6 @@ void helper_lsx_xvpickod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     uint32_t i;
 
-#if defined(HOST_WORDS_BIGENDIAN)
-    switch (df) {
-    case DF_BYTE:
-        pwd->b[24] = pws->b[8];
-        pwd->b[25] = pws->b[10];
-        pwd->b[26] = pws->b[12];
-        pwd->b[27] = pws->b[14];
-        pwd->b[28] = pws->b[0];
-        pwd->b[29] = pws->b[2];
-        pwd->b[30] = pws->b[4];
-        pwd->b[31] = pws->b[6];
-        pwd->b[16] = pws->b[24];
-        pwd->b[17] = pws->b[26];
-        pwd->b[18] = pws->b[28];
-        pwd->b[19] = pws->b[30];
-        pwd->b[20] = pws->b[16];
-        pwd->b[21] = pws->b[18];
-        pwd->b[22] = pws->b[20];
-        pwd->b[23] = pws->b[22];
-        pwd->b[8]  = pwt->b[8];
-        pwd->b[9]  = pwt->b[10];
-        pwd->b[10] = pwt->b[12];
-        pwd->b[11] = pwt->b[14];
-        pwd->b[12] = pwt->b[0];
-        pwd->b[13] = pwt->b[2];
-        pwd->b[14] = pwt->b[4];
-        pwd->b[15] = pwt->b[6];
-        pwd->b[0]  = pwt->b[24];
-        pwd->b[1]  = pwt->b[26];
-        pwd->b[2]  = pwt->b[28];
-        pwd->b[3]  = pwt->b[30];
-        pwd->b[4]  = pwt->b[16];
-        pwd->b[5]  = pwt->b[18];
-        pwd->b[6]  = pwt->b[20];
-        pwd->b[7]  = pwt->b[22];
-        break;
-    case DF_HALF:
-        pwd->h[12] = pws->h[4];
-        pwd->h[13] = pws->h[6];
-        pwd->h[14] = pws->h[0];
-        pwd->h[15] = pws->h[2];
-        pwd->h[8]  = pws->h[12];
-        pwd->h[9]  = pws->h[14];
-        pwd->h[10] = pws->h[8];
-        pwd->h[11] = pws->h[10];
-        pwd->h[4]  = pwt->h[4];
-        pwd->h[5]  = pwt->h[6];
-        pwd->h[6]  = pwt->h[0];
-        pwd->h[7]  = pwt->h[2];
-        pwd->h[0]  = pwt->h[12];
-        pwd->h[1]  = pwt->h[14];
-        pwd->h[2]  = pwt->h[8];
-        pwd->h[3]  = pwt->h[10];
-        break;
-    case DF_WORD:
-        pwd->w[6] = pws->w[2];
-        pwd->w[7] = pws->w[0];
-        pwd->w[4] = pws->w[6];
-        pwd->w[5] = pws->w[4];
-        pwd->w[2] = pwt->w[2];
-        pwd->w[3] = pwt->w[0];
-        pwd->w[0] = pwt->w[6];
-        pwd->w[1] = pwt->w[4];
-        break;
-    case DF_DOUBLE:
-        pwd->d[2] = pws->d[2];
-        pwd->d[3] = pws->d[0];
-        pwd->d[0] = pwt->d[2];
-        pwd->d[1] = pwt->d[0];
-       break;
-    default:
-        assert(0);
-    }
-#else
     switch (df) {
     case DF_BYTE:
         for (i = 0; i < (256/16); i++) {
@@ -2728,7 +2367,6 @@ void helper_lsx_xvpickod_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     default:
         assert(0);
     }
-#endif
 }
 
 
@@ -16353,7 +15991,6 @@ void helper_lsx_xvld(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     wr_t *pwd = &(env->fpr[wd].wr);
     MEMOP_IDX(DF_BYTE)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
     pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
     pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
@@ -16387,41 +16024,6 @@ void helper_lsx_xvld(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     pwd->b[30] = helper_ret_ldub_mmu(env, addr + (30 << DF_BYTE), oi, GETPC());
     pwd->b[31] = helper_ret_ldub_mmu(env, addr + (31 << DF_BYTE), oi, GETPC());
 #else
-    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
-    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
-    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
-    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
-    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
-    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
-    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
-    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
-    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
-    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
-    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
-    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
-    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
-    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
-    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
-    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
-    pwd->b[16] = helper_ret_ldub_mmu(env, addr + (23 << DF_BYTE), oi, GETPC());
-    pwd->b[17] = helper_ret_ldub_mmu(env, addr + (22 << DF_BYTE), oi, GETPC());
-    pwd->b[18] = helper_ret_ldub_mmu(env, addr + (21 << DF_BYTE), oi, GETPC());
-    pwd->b[19] = helper_ret_ldub_mmu(env, addr + (20 << DF_BYTE), oi, GETPC());
-    pwd->b[20] = helper_ret_ldub_mmu(env, addr + (19 << DF_BYTE), oi, GETPC());
-    pwd->b[21] = helper_ret_ldub_mmu(env, addr + (18 << DF_BYTE), oi, GETPC());
-    pwd->b[22] = helper_ret_ldub_mmu(env, addr + (17 << DF_BYTE), oi, GETPC());
-    pwd->b[23] = helper_ret_ldub_mmu(env, addr + (16 << DF_BYTE), oi, GETPC());
-    pwd->b[24] = helper_ret_ldub_mmu(env, addr + (31 << DF_BYTE), oi, GETPC());
-    pwd->b[25] = helper_ret_ldub_mmu(env, addr + (30 << DF_BYTE), oi, GETPC());
-    pwd->b[26] = helper_ret_ldub_mmu(env, addr + (29 << DF_BYTE), oi, GETPC());
-    pwd->b[27] = helper_ret_ldub_mmu(env, addr + (28 << DF_BYTE), oi, GETPC());
-    pwd->b[28] = helper_ret_ldub_mmu(env, addr + (27 << DF_BYTE), oi, GETPC());
-    pwd->b[29] = helper_ret_ldub_mmu(env, addr + (26 << DF_BYTE), oi, GETPC());
-    pwd->b[30] = helper_ret_ldub_mmu(env, addr + (25 << DF_BYTE), oi, GETPC());
-    pwd->b[31] = helper_ret_ldub_mmu(env, addr + (24 << DF_BYTE), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     pwd->b[0]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
     pwd->b[1]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
     pwd->b[2]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
@@ -16454,40 +16056,6 @@ void helper_lsx_xvld(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     pwd->b[29] = cpu_ldub_data(env, addr + (29 << DF_BYTE));
     pwd->b[30] = cpu_ldub_data(env, addr + (30 << DF_BYTE));
     pwd->b[31] = cpu_ldub_data(env, addr + (31 << DF_BYTE));
-#else
-    pwd->b[0]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
-    pwd->b[1]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
-    pwd->b[2]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
-    pwd->b[3]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
-    pwd->b[4]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
-    pwd->b[5]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
-    pwd->b[6]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
-    pwd->b[7]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
-    pwd->b[8]  = cpu_ldub_data(env, addr + (15 << DF_BYTE));
-    pwd->b[9]  = cpu_ldub_data(env, addr + (14 << DF_BYTE));
-    pwd->b[10] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
-    pwd->b[11] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
-    pwd->b[12] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
-    pwd->b[13] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
-    pwd->b[14] = cpu_ldub_data(env, addr + (9  << DF_BYTE));
-    pwd->b[15] = cpu_ldub_data(env, addr + (8  << DF_BYTE));
-    pwd->b[16] = cpu_ldub_data(env, addr + (23 << DF_BYTE));
-    pwd->b[17] = cpu_ldub_data(env, addr + (22 << DF_BYTE));
-    pwd->b[18] = cpu_ldub_data(env, addr + (21 << DF_BYTE));
-    pwd->b[19] = cpu_ldub_data(env, addr + (20 << DF_BYTE));
-    pwd->b[20] = cpu_ldub_data(env, addr + (19 << DF_BYTE));
-    pwd->b[21] = cpu_ldub_data(env, addr + (18 << DF_BYTE));
-    pwd->b[22] = cpu_ldub_data(env, addr + (17 << DF_BYTE));
-    pwd->b[23] = cpu_ldub_data(env, addr + (16 << DF_BYTE));
-    pwd->b[24] = cpu_ldub_data(env, addr + (31 << DF_BYTE));
-    pwd->b[25] = cpu_ldub_data(env, addr + (30 << DF_BYTE));
-    pwd->b[26] = cpu_ldub_data(env, addr + (29 << DF_BYTE));
-    pwd->b[27] = cpu_ldub_data(env, addr + (28 << DF_BYTE));
-    pwd->b[28] = cpu_ldub_data(env, addr + (27 << DF_BYTE));
-    pwd->b[29] = cpu_ldub_data(env, addr + (26 << DF_BYTE));
-    pwd->b[30] = cpu_ldub_data(env, addr + (25 << DF_BYTE));
-    pwd->b[31] = cpu_ldub_data(env, addr + (24 << DF_BYTE));
-#endif
 #endif
 }
 
@@ -16619,7 +16187,6 @@ void helper_lsx_xvst(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     MEMOP_IDX(DF_BYTE)
     ensure_lasx_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
     helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
     helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
@@ -16653,41 +16220,6 @@ void helper_lsx_xvst(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     helper_ret_stb_mmu(env, addr + (30 << DF_BYTE), pwd->b[30], oi, GETPC());
     helper_ret_stb_mmu(env, addr + (31 << DF_BYTE), pwd->b[31], oi, GETPC());
 #else
-    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (23 << DF_BYTE), pwd->b[16], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (22 << DF_BYTE), pwd->b[17], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (21 << DF_BYTE), pwd->b[18], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (20 << DF_BYTE), pwd->b[19], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (19 << DF_BYTE), pwd->b[20], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (18 << DF_BYTE), pwd->b[21], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (17 << DF_BYTE), pwd->b[22], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (16 << DF_BYTE), pwd->b[23], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (31 << DF_BYTE), pwd->b[24], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (30 << DF_BYTE), pwd->b[25], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (29 << DF_BYTE), pwd->b[26], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (28 << DF_BYTE), pwd->b[27], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (27 << DF_BYTE), pwd->b[28], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (26 << DF_BYTE), pwd->b[29], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (25 << DF_BYTE), pwd->b[30], oi, GETPC());
-    helper_ret_stb_mmu(env, addr + (24 << DF_BYTE), pwd->b[31], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
     cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
     cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
@@ -16720,40 +16252,6 @@ void helper_lsx_xvst(CPULoongArchState *env, uint32_t wd, target_ulong addr)
     cpu_stb_data(env, addr + (29 << DF_BYTE), pwd->b[29]);
     cpu_stb_data(env, addr + (30 << DF_BYTE), pwd->b[30]);
     cpu_stb_data(env, addr + (31 << DF_BYTE), pwd->b[31]);
-#else
-    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
-    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
-    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
-    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
-    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
-    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
-    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
-    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
-    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
-    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
-    cpu_stb_data(env, addr + (23 << DF_BYTE), pwd->b[16]);
-    cpu_stb_data(env, addr + (22 << DF_BYTE), pwd->b[17]);
-    cpu_stb_data(env, addr + (21 << DF_BYTE), pwd->b[18]);
-    cpu_stb_data(env, addr + (20 << DF_BYTE), pwd->b[19]);
-    cpu_stb_data(env, addr + (19 << DF_BYTE), pwd->b[20]);
-    cpu_stb_data(env, addr + (18 << DF_BYTE), pwd->b[21]);
-    cpu_stb_data(env, addr + (17 << DF_BYTE), pwd->b[22]);
-    cpu_stb_data(env, addr + (16 << DF_BYTE), pwd->b[23]);
-    cpu_stb_data(env, addr + (31 << DF_BYTE), pwd->b[24]);
-    cpu_stb_data(env, addr + (30 << DF_BYTE), pwd->b[25]);
-    cpu_stb_data(env, addr + (29 << DF_BYTE), pwd->b[26]);
-    cpu_stb_data(env, addr + (28 << DF_BYTE), pwd->b[27]);
-    cpu_stb_data(env, addr + (27 << DF_BYTE), pwd->b[28]);
-    cpu_stb_data(env, addr + (26 << DF_BYTE), pwd->b[29]);
-    cpu_stb_data(env, addr + (25 << DF_BYTE), pwd->b[30]);
-    cpu_stb_data(env, addr + (24 << DF_BYTE), pwd->b[31]);
-#endif
 #endif
 }
 
@@ -16898,17 +16396,9 @@ void helper_lsx_vldrepl_w(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint32_t data;
     MEMOP_IDX(DF_WORD)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
 #else
-    data = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_ldl_data(env, addr + (0 << DF_WORD));
-#else
-    data = cpu_ldl_data(env, addr + (1 << DF_WORD));
-#endif
 #endif
     pwd->w[0] = data;
     pwd->w[1] = data;
@@ -16923,17 +16413,9 @@ void helper_lsx_vldrepl_h(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint16_t data;
     MEMOP_IDX(DF_HALF)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
 #else
-    data = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_lduw_data(env, addr + (0 << DF_HALF));
-#else
-    data = cpu_lduw_data(env, addr + (3 << DF_HALF));
-#endif
 #endif
     int i;
     for (i = 0; i < 8; i++) {
@@ -16948,17 +16430,9 @@ void helper_lsx_vldrepl_b(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint8_t data;
     MEMOP_IDX(DF_BYTE)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
 #else
-    data = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_ldub_data(env, addr + (0  << DF_BYTE));
-#else
-    data = cpu_ldub_data(env, addr + (7  << DF_BYTE));
-#endif
 #endif
     int i;
     for (i = 0; i < 16; i++) {
@@ -16988,17 +16462,9 @@ void helper_lsx_vstelm_w(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_WORD)
     ensure_w_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[sel], oi, GETPC());
 #else
-    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[sel], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[sel]);
-#else
-    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[sel]);
-#endif
 #endif
 }
 
@@ -17011,17 +16477,9 @@ void helper_lsx_vstelm_h(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_HALF)
     ensure_h_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[sel], oi, GETPC());
 #else
-    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[sel], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[sel]);
-#else
-    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[sel]);
-#endif
 #endif
 }
 
@@ -17034,17 +16492,9 @@ void helper_lsx_vstelm_b(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_BYTE)
     ensure_b_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stb_mmu(env, addr + (0 << DF_BYTE), pwd->b[sel], oi, GETPC());
 #else
-    helper_ret_stb_mmu(env, addr + (7 << DF_BYTE), pwd->b[sel], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stb_data(env, addr + (0 << DF_BYTE), pwd->b[sel]);
-#else
-    cpu_stb_data(env, addr + (7 << DF_BYTE), pwd->b[sel]);
-#endif
 #endif
 }
 
@@ -17071,17 +16521,9 @@ void helper_lsx_xvldrepl_w(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint32_t data;
     MEMOP_IDX(DF_WORD)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
 #else
-    data = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_ldl_data(env, addr + (0 << DF_WORD));
-#else
-    data = cpu_ldl_data(env, addr + (1 << DF_WORD));
-#endif
 #endif
     int i;
     for (i = 0; i < 8; i++) {
@@ -17096,17 +16538,9 @@ void helper_lsx_xvldrepl_h(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint16_t data;
     MEMOP_IDX(DF_HALF)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
 #else
-    data = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_lduw_data(env, addr + (0 << DF_HALF));
-#else
-    data = cpu_lduw_data(env, addr + (3 << DF_HALF));
-#endif
 #endif
     int i;
     for (i = 0; i < 16; i++) {
@@ -17121,17 +16555,9 @@ void helper_lsx_xvldrepl_b(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint8_t data;
     MEMOP_IDX(DF_BYTE)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
 #else
-    data = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     data = cpu_ldub_data(env, addr + (0  << DF_BYTE));
-#else
-    data = cpu_ldub_data(env, addr + (7  << DF_BYTE));
-#endif
 #endif
     int i;
     for (i = 0; i < 32; i++) {
@@ -17164,17 +16590,9 @@ void helper_lsx_xvstelm_w(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_WORD)
     ensure_w_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[idx], oi, GETPC());
 #else
-    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[idx], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[idx]);
-#else
-    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[idx]);
-#endif
 #endif
 }
 
@@ -17188,17 +16606,9 @@ void helper_lsx_xvstelm_h(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_HALF)
     ensure_h_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[idx], oi, GETPC());
 #else
-    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[idx], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[idx]);
-#else
-    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[idx]);
-#endif
 #endif
 }
 
@@ -17212,17 +16622,9 @@ void helper_lsx_xvstelm_b(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_BYTE)
     ensure_b_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_WORDS_BIGENDIAN)
     helper_ret_stb_mmu(env, addr + (0 << DF_BYTE), pwd->b[idx], oi, GETPC());
 #else
-    helper_ret_stb_mmu(env, addr + (7 << DF_BYTE), pwd->b[idx], oi, GETPC());
-#endif
-#else
-#if !defined(HOST_WORDS_BIGENDIAN)
     cpu_stb_data(env, addr + (0 << DF_BYTE), pwd->b[idx]);
-#else
-    cpu_stb_data(env, addr + (7 << DF_BYTE), pwd->b[idx]);
-#endif
 #endif
 }
 
@@ -17294,17 +16696,6 @@ void helper_lsx_xvinsgr2vr_w(CPULoongArchState *env, uint32_t wd, uint32_t rs_nu
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 8;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 2) {
-        n = 2 - n - 1;
-    } else if (n < 4) {
-        n = 6 - n - 1;
-    } else if (n < 6) {
-        n = 10 - n - 1;
-    } else {
-        n = 14 - n - 1;
-    }
-#endif
     pwd->w[n] = (int32_t)rs;
 }
 
@@ -17319,17 +16710,6 @@ void helper_lsx_xvinsgr2vr_d(CPULoongArchState *env, uint32_t wd, uint32_t rs_nu
 void helper_lsx_xvpickve2gr_w(CPULoongArchState *env, uint32_t rd, uint32_t ws, uint32_t n)
 {
     n %= 8;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 2) {
-        n = 2 - n - 1;
-    } else if (n < 4) {
-        n = 6 - n - 1;
-    } else if (n < 6) {
-        n = 10 - n - 1;
-    } else {
-        n = 14 - n - 1;
-    }
-#endif
     env->gpr[rd] = (int32_t)env->fpr[ws].wr.w[n];
 }
 
@@ -17342,17 +16722,6 @@ void helper_lsx_xvpickve2gr_d(CPULoongArchState *env, uint32_t rd, uint32_t ws, 
 void helper_lsx_xvpickve2gr_wu(CPULoongArchState *env, uint32_t rd, uint32_t ws, uint32_t n)
 {
     n %= 8;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 2) {
-        n = 2 - n - 1;
-    } else if (n < 4) {
-        n = 6 - n - 1;
-    } else if (n < 6) {
-        n = 10 - n - 1;
-    } else {
-        n = 14 - n - 1;
-    }
-#endif
     env->gpr[rd] = (uint32_t)env->fpr[ws].wr.w[n];
 }
 
@@ -18246,13 +17615,6 @@ void helper_lsx_vinsgr2vr_b(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 16;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 8) {
-        n = 8 - n - 1;
-    } else {
-        n = 24 - n - 1;
-    }
-#endif
     pwd->b[n] = (int8_t)rs;
 }
 
@@ -18262,13 +17624,6 @@ void helper_lsx_vinsgr2vr_h(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 8;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 4) {
-        n = 4 - n - 1;
-    } else {
-        n = 12 - n - 1;
-    }
-#endif
     pwd->h[n] = (int16_t)rs;
 }
 
@@ -18278,13 +17633,6 @@ void helper_lsx_vinsgr2vr_w(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 4;
-#if defined(HOST_WORDS_BIGENDIAN)
-    if (n < 2) {
-        n = 2 - n - 1;
-    } else {
-        n = 6 - n - 1;
-    }
-#endif
     pwd->w[n] = (int32_t)rs;
 }
 
