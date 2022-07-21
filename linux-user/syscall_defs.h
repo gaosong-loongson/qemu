@@ -450,7 +450,7 @@ struct target_dirent64 {
 #define TARGET_SIG_IGN	((abi_long)1)	/* ignore signal */
 #define TARGET_SIG_ERR	((abi_long)-1)	/* error return from signal */
 
-#ifdef TARGET_MIPS
+#if defined(TARGET_MIPS) || defined(TARGET_LOONGARCH64)
 #define TARGET_NSIG	   128
 #else
 #define TARGET_NSIG	   64
@@ -2085,7 +2085,8 @@ struct target_stat64  {
 };
 
 #elif defined(TARGET_OPENRISC) || defined(TARGET_NIOS2) \
-        || defined(TARGET_RISCV) || defined(TARGET_HEXAGON)
+        || defined(TARGET_RISCV) || defined(TARGET_HEXAGON) || \
+	defined(TARGET_LOONGARCH64)
 
 /* These are the asm-generic versions of the stat and stat64 structures */
 
@@ -2113,7 +2114,7 @@ struct target_stat {
     unsigned int __unused5;
 };
 
-#if !defined(TARGET_RISCV64)
+#if !defined(TARGET_RISCV64) || defined(TARGET_LOONGARCH64)
 #define TARGET_HAS_STRUCT_STAT64
 struct target_stat64 {
     uint64_t st_dev;
@@ -2196,10 +2197,6 @@ struct target_stat64 {
     uint64_t   st_ino;
 };
 
-#elif defined(TARGET_LOONGARCH64)
-
-/* LoongArch no newfstatat/fstat syscall. */
-
 #else
 #error unsupported CPU
 #endif
@@ -2262,6 +2259,7 @@ struct target_statfs64 {
 };
 #elif (defined(TARGET_PPC64) || defined(TARGET_X86_64) || \
        defined(TARGET_SPARC64) || defined(TARGET_AARCH64) || \
+       defined(TARGET_LOONGARCH64) || \
        defined(TARGET_RISCV)) && !defined(TARGET_ABI32)
 struct target_statfs {
 	abi_long f_type;
