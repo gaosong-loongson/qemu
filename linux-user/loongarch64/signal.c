@@ -23,11 +23,16 @@ struct target_sigcontext {
     uint64_t sc_extcontext[0]   QEMU_ALIGNED(16);
 };
 
+#define FPU_REG_WIDTH   256
+union fpureg {
+    uint32_t   val32[FPU_REG_WIDTH / 32];
+    uint64_t   val64[FPU_REG_WIDTH / 64];
+};
 
 #define FPU_CTX_MAGIC           0x46505501
 #define FPU_CTX_ALIGN           8
 struct target_fpu_context {
-    uint64_t regs[32];
+    union fpureg    regs[32] __attribute__((aligned(32)));
     uint64_t fcc;
     uint32_t fcsr;
 } QEMU_ALIGNED(FPU_CTX_ALIGN);
@@ -148,7 +153,7 @@ static void setup_sigframe(CPULoongArchState *env,
 
     fpu_ctx = (struct target_fpu_context *)(info + 1);
     for (i = 0; i < 32; ++i) {
-        __put_user(env->fpr[i], &fpu_ctx->regs[i]);
+        __put_user(env->fpr[i].d, &fpu_ctx->regs[i].val64[0]);
     }
     __put_user(read_all_fcc(env), &fpu_ctx->fcc);
     __put_user(env->fcsr0, &fpu_ctx->fcsr);
@@ -213,7 +218,7 @@ static void restore_sigframe(CPULoongArchState *env,
         uint64_t fcc;
 
         for (i = 0; i < 32; ++i) {
-            __get_user(env->fpr[i], &fpu_ctx->regs[i]);
+            __get_user(env->fpr[i].d, &fpu_ctx->regs[i].val64[0]);
         }
         __get_user(fcc, &fpu_ctx->fcc);
         write_all_fcc(env, fcc);

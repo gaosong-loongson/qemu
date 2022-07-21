@@ -23,6 +23,7 @@
 #include "exec/exec-all.h"
 #include "exec/helper-proto.h"
 #include "fpu/softfloat.h"
+#include "tcg/tcg-ldst.h"
 
 /* Data format min and max values */
 #define DF_BITS(df) (1 << ((df) + 3))
@@ -5051,9 +5052,9 @@ void helper_msa_ctcmsa(CPULoongArchState *env, target_ulong elm, uint32_t cd)
         env->fcsr0 = (int32_t)elm & MSACSR_MASK;
         restore_fp_status(env);
         /* check exception */
-        if ((GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED)
+        if ((GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED)
             & GET_FP_CAUSE(env->fcsr0)) {
-            do_raise_exception(env, EXCP_MSAFPE, GETPC());
+            do_raise_exception(env, EXCCODE_FPE, GETPC());
         }
         break;
     }
@@ -5063,7 +5064,6 @@ target_ulong helper_msa_cfcmsa(CPULoongArchState *env, uint32_t cs)
 {
     switch (cs) {
     case 0:
-        return env->msair;
     case 1:
         return env->fcsr0 & MSACSR_MASK;
     }
@@ -5121,11 +5121,11 @@ static inline void clear_msacsr_cause(CPULoongArchState *env)
 static inline void check_msacsr_cause(CPULoongArchState *env, uintptr_t retaddr)
 {
     if ((GET_FP_CAUSE(env->fcsr0) &
-            (GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED)) == 0) {
+            (GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED)) == 0) {
         UPDATE_FP_FLAGS(env->fcsr0,
                 GET_FP_CAUSE(env->fcsr0));
     } else {
-        do_raise_exception(env, EXCP_MSAFPE, retaddr);
+        do_raise_exception(env, EXCCODE_FPE, retaddr);
     }
 }
 
@@ -5150,7 +5150,7 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
     }
 
     c = ieee_ex_to_loongarch(ieee_ex);
-    enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
+    enable = GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED;
 
     /* Set Inexact (I) when flushing inputs to zero */
     if ((ieee_ex & float_flag_input_denormal) &&
@@ -5219,11 +5219,11 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
 
 static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 {
-    int enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
+    int enable = GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED;
     return c & enable;
 }
 
-static inline float16 float16_from_float32(int32_t a, flag ieee,
+static inline float16 float16_from_float32(int32_t a, bool ieee,
                                            float_status *status)
 {
       float16 f_val;
@@ -5242,7 +5242,7 @@ static inline float32 float32_from_float64(int64_t a, float_status *status)
       return a < 0 ? (f_val | (1 << 31)) : f_val;
 }
 
-static inline float32 float32_from_float16(int16_t a, flag ieee,
+static inline float32 float32_from_float16(int16_t a, bool ieee,
                                            float_status *status)
 {
       float32 f_val;
@@ -6279,7 +6279,7 @@ void helper_msa_fexdo_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
              * IEEE and "ARM" format.  The latter gains extra exponent
              * range by omitting the NaN/Inf encodings.
              */
-            flag ieee = 1;
+            bool ieee = 1;
 
             MSA_FLOAT_BINOP(Lh(pwx, i), from_float32, pws->w[i], ieee, 16);
             MSA_FLOAT_BINOP(Rh(pwx, i), from_float32, pwt->w[i], ieee, 16);
@@ -6589,18 +6589,16 @@ void helper_msa_fmax_a_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 void helper_msa_fclass_df(CPULoongArchState *env, uint32_t df,
         uint32_t wd, uint32_t ws)
 {
-    float_status *status = &env->fp_status;
-
     wr_t *pwd = &(env->fpr[wd].wr);
     wr_t *pws = &(env->fpr[ws].wr);
     if (df == DF_WORD) {
-        pwd->w[0] = float_class_s(pws->w[0], status);
-        pwd->w[1] = float_class_s(pws->w[1], status);
-        pwd->w[2] = float_class_s(pws->w[2], status);
-        pwd->w[3] = float_class_s(pws->w[3], status);
+        pwd->w[0] = helper_fclass_s(env, pws->w[0]);
+        pwd->w[1] = helper_fclass_s(env, pws->w[1]);
+        pwd->w[2] = helper_fclass_s(env, pws->w[2]);
+        pwd->w[3] = helper_fclass_s(env, pws->w[3]);
     } else if (df == DF_DOUBLE) {
-        pwd->d[0] = float_class_d(pws->d[0], status);
-        pwd->d[1] = float_class_d(pws->d[1], status);
+        pwd->d[0] = helper_fclass_d(env, pws->d[0]);
+        pwd->d[1] = helper_fclass_d(env, pws->d[1]);
     } else {
         assert(0);
     }
@@ -6821,6 +6819,14 @@ void helper_msa_frint_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
     msa_move_v(pwd, pwx);
 }
 
+/* Convert loongarch rounding mode in fcsr0 to IEEE library */
+const FloatRoundMode ieee_rm[4] = {
+    float_round_nearest_even,
+    float_round_to_zero,
+    float_round_up,
+    float_round_down
+};
+
 #define MSA_FLOAT_LOGB(DEST, ARG, BITS)                                     \
     do {                                                                    \
         float_status *status = &env->fp_status;               \
@@ -6893,7 +6899,7 @@ void helper_msa_fexupl_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
              * IEEE and "ARM" format.  The latter gains extra exponent
              * range by omitting the NaN/Inf encodings.
              */
-            flag ieee = 1;
+            bool ieee = 1;
 
             MSA_FLOAT_BINOP(pwx->w[i], from_float16, Lh(pws, i), ieee, 32);
         }
@@ -6929,7 +6935,7 @@ void helper_msa_fexupr_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
              * IEEE and "ARM" format.  The latter gains extra exponent
              * range by omitting the NaN/Inf encodings.
              */
-            flag ieee = 1;
+            bool ieee = 1;
 
             MSA_FLOAT_BINOP(pwx->w[i], from_float16, Rh(pws, i), ieee, 32);
         }
@@ -7124,3 +7130,244 @@ void helper_msa_ffint_u_df(CPULoongArchState *env, uint32_t df, uint32_t wd,
 
     msa_move_v(pwd, pwx);
 }
+
+#if !defined(CONFIG_USER_ONLY)
+#define MEMOP_IDX(DF)                                           \
+        MemOpIdx oi = make_memop_idx(MO_TE | DF | MO_UNALN,  \
+                                        cpu_mmu_index(env, false));
+#else
+#define MEMOP_IDX(DF)
+#endif
+
+void helper_msa_ld_b(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    MEMOP_IDX(DF_BYTE)
+#if !defined(CONFIG_USER_ONLY)
+    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
+    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
+    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
+    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
+    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
+    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
+    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
+    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
+    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
+    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
+    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
+    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
+    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
+    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
+    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
+    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
+#else
+    pwd->b[0]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
+    pwd->b[1]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
+    pwd->b[2]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
+    pwd->b[3]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
+    pwd->b[4]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
+    pwd->b[5]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
+    pwd->b[6]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
+    pwd->b[7]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
+    pwd->b[8]  = cpu_ldub_data(env, addr + (8  << DF_BYTE));
+    pwd->b[9]  = cpu_ldub_data(env, addr + (9  << DF_BYTE));
+    pwd->b[10] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
+    pwd->b[11] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
+    pwd->b[12] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
+    pwd->b[13] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
+    pwd->b[14] = cpu_ldub_data(env, addr + (14 << DF_BYTE));
+    pwd->b[15] = cpu_ldub_data(env, addr + (15 << DF_BYTE));
+#endif
+}
+
+#define LSX_PAGESPAN(x) \
+        ((((x) & ~TARGET_PAGE_MASK) + LSX_WRLEN / 8 - 1) >= TARGET_PAGE_SIZE)
+
+static inline void ensure_writable_pages(CPULoongArchState *env,
+                                         target_ulong addr,
+                                         int mmu_idx,
+                                         uintptr_t retaddr)
+{
+#ifndef CONFIG_USER_ONLY
+    /* FIXME: Probe the actual accesses (pass and use a size) */
+    if (unlikely(LSX_PAGESPAN(addr))) {
+        /* first page */
+        probe_write(env, addr, 0, mmu_idx, retaddr);
+        /* second page */
+        addr = (addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+        probe_write(env, addr, 0, mmu_idx, retaddr);
+    }
+#endif
+}
+
+void helper_msa_st_b(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    int mmu_idx = cpu_mmu_index(env, false);
+
+    MEMOP_IDX(DF_BYTE)
+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
+#if !defined(CONFIG_USER_ONLY)
+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
+#else
+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
+#endif
+}
+
+void helper_msa_ld_h(CPULoongArchState *env, uint32_t wd, 
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    MEMOP_IDX(DF_HALF)
+#if !defined(CONFIG_USER_ONLY)
+    pwd->h[0] = helper_le_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
+    pwd->h[1] = helper_le_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
+    pwd->h[2] = helper_le_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
+    pwd->h[3] = helper_le_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
+    pwd->h[4] = helper_le_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
+    pwd->h[5] = helper_le_lduw_mmu(env, addr + (5 << DF_HALF), oi, GETPC());
+    pwd->h[6] = helper_le_lduw_mmu(env, addr + (6 << DF_HALF), oi, GETPC());
+    pwd->h[7] = helper_le_lduw_mmu(env, addr + (7 << DF_HALF), oi, GETPC());
+#else
+    pwd->h[0] = cpu_lduw_data(env, addr + (0 << DF_HALF));
+    pwd->h[1] = cpu_lduw_data(env, addr + (1 << DF_HALF));
+    pwd->h[2] = cpu_lduw_data(env, addr + (2 << DF_HALF));
+    pwd->h[3] = cpu_lduw_data(env, addr + (3 << DF_HALF));
+    pwd->h[4] = cpu_lduw_data(env, addr + (4 << DF_HALF));
+    pwd->h[5] = cpu_lduw_data(env, addr + (5 << DF_HALF));
+    pwd->h[6] = cpu_lduw_data(env, addr + (6 << DF_HALF));
+    pwd->h[7] = cpu_lduw_data(env, addr + (7 << DF_HALF));
+#endif
+}
+
+void helper_msa_ld_w(CPULoongArchState *env, uint32_t wd, 
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    MEMOP_IDX(DF_WORD)
+#if !defined(CONFIG_USER_ONLY)
+    pwd->w[0] = helper_le_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
+    pwd->w[1] = helper_le_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
+    pwd->w[2] = helper_le_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
+    pwd->w[3] = helper_le_ldul_mmu(env, addr + (3 << DF_WORD), oi, GETPC());
+#else
+    pwd->w[0] = cpu_ldl_data(env, addr + (0 << DF_WORD));
+    pwd->w[1] = cpu_ldl_data(env, addr + (1 << DF_WORD));
+    pwd->w[2] = cpu_ldl_data(env, addr + (2 << DF_WORD));
+    pwd->w[3] = cpu_ldl_data(env, addr + (3 << DF_WORD));
+#endif
+}
+
+void helper_msa_ld_d(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    MEMOP_IDX(DF_DOUBLE)
+#if !defined(CONFIG_USER_ONLY)
+    pwd->d[0] = helper_le_ldq_mmu(env, addr + (0 << DF_DOUBLE), oi, GETPC());
+    pwd->d[1] = helper_le_ldq_mmu(env, addr + (1 << DF_DOUBLE), oi, GETPC());
+#else
+    pwd->d[0] = cpu_ldq_data(env, addr + (0 << DF_DOUBLE));
+    pwd->d[1] = cpu_ldq_data(env, addr + (1 << DF_DOUBLE));
+#endif
+}
+
+void helper_msa_st_h(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    int mmu_idx = cpu_mmu_index(env, false);
+
+    MEMOP_IDX(DF_HALF)
+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
+#if !defined(CONFIG_USER_ONLY)
+    helper_le_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
+#else
+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
+#endif
+}
+
+void helper_msa_st_w(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    int mmu_idx = cpu_mmu_index(env, false);
+
+    MEMOP_IDX(DF_WORD)
+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
+#if !defined(CONFIG_USER_ONLY)
+    helper_le_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[0], oi, GETPC());
+    helper_le_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[1], oi, GETPC());
+    helper_le_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[2], oi, GETPC());
+    helper_le_stl_mmu(env, addr + (3 << DF_WORD), pwd->w[3], oi, GETPC());
+#else
+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
+#endif
+}
+
+void helper_msa_st_d(CPULoongArchState *env, uint32_t wd,
+                     target_ulong addr)
+{
+    wr_t *pwd = &(env->fpr[wd].wr);
+    int mmu_idx = cpu_mmu_index(env, false);
+
+    MEMOP_IDX(DF_DOUBLE)
+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
+#if !defined(CONFIG_USER_ONLY)
+    helper_le_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
+    helper_le_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
+#else
+    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
+    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
+#endif
+}
+

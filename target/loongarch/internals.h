@@ -21,6 +21,8 @@ enum CPULSXDataFormat {
     DF_QUAD
 };
 
+int ieee_ex_to_loongarch(int xcpt);
+
 #define TARGET_PHYS_MASK MAKE_64BIT_MASK(0, TARGET_PHYS_ADDR_SPACE_BITS)
 #define TARGET_VIRT_MASK MAKE_64BIT_MASK(0, TARGET_VIRT_ADDR_SPACE_BITS)
 

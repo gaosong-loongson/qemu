@@ -5,7 +5,7 @@
 #include "exec/cpu_ldst.h"
 #include "exec/helper-proto.h"
 #include "fpu/softfloat.h"
-#include "tcg.h"
+#include "tcg/tcg-ldst.h"
 /* Data format min and max values */
 #define DF_BITS(df) (1 << ((df) + 3))
 
@@ -82,11 +82,11 @@ static inline void clear_msacsr_cause(CPULoongArchState *env)
 static inline void check_msacsr_cause(CPULoongArchState *env, uintptr_t retaddr)
 {
     if ((GET_FP_CAUSE(env->fcsr0) &
-            (GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED)) == 0) {
+            (GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED)) == 0) {
         UPDATE_FP_FLAGS(env->fcsr0,
                 GET_FP_CAUSE(env->fcsr0));
     } else {
-        do_raise_exception(env, EXCP_FPE, retaddr);
+        do_raise_exception(env, EXCCODE_FPE, retaddr);
     }
 }
 
@@ -110,8 +110,8 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
         ieee_ex |= float_flag_underflow;
     }
 
-    c = ieee_ex_to_mips(ieee_ex);
-    enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
+    c = ieee_ex_to_loongarch(ieee_ex);
+    enable = GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED;
 
     /* Set Inexact (I) when flushing inputs to zero */
     if ((ieee_ex & float_flag_input_denormal) &&
@@ -180,7 +180,7 @@ static inline int update_msacsr(CPULoongArchState *env, int action, int denormal
 
 static inline int get_enabled_exceptions(const CPULoongArchState *env, int c)
 {
-    int enable = GET_FP_ENABLE(env->fcsr0) | FP_UNIMPLEMENTED;
+    int enable = GET_FP_ENABLES(env->fcsr0) | FP_UNIMPLEMENTED;
     return c & enable;
 }
 
@@ -15980,7 +15980,7 @@ void helper_lsx_xvshuf2_d(CPULoongArchState *env, uint32_t wd, uint32_t ws, uint
 }
 #if !defined(CONFIG_USER_ONLY)
 #define MEMOP_IDX(DF)                                           \
-        TCGMemOpIdx oi = make_memop_idx(MO_TE | DF | MO_UNALN,  \
+        MemOpIdx oi = make_memop_idx(MO_TE | DF | MO_UNALN,  \
                                         cpu_mmu_index(env, false));
 #else
 #define MEMOP_IDX(DF)
@@ -16381,7 +16381,7 @@ void helper_lsx_vldrepl_d(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint64_t data;
     MEMOP_IDX(DF_DOUBLE)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_ldq_mmu(env, addr, oi, GETPC());
+    data = helper_le_ldq_mmu(env, addr, oi, GETPC());
 #else
     data = cpu_ldq_data(env, addr);
 #endif
@@ -16396,7 +16396,7 @@ void helper_lsx_vldrepl_w(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint32_t data;
     MEMOP_IDX(DF_WORD)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
+    data = helper_le_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
 #else
     data = cpu_ldl_data(env, addr + (0 << DF_WORD));
 #endif
@@ -16413,7 +16413,7 @@ void helper_lsx_vldrepl_h(CPULoongArchState *env, uint32_t wd, target_ulong addr
     uint16_t data;
     MEMOP_IDX(DF_HALF)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
+    data = helper_le_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
 #else
     data = cpu_lduw_data(env, addr + (0 << DF_HALF));
 #endif
@@ -16447,7 +16447,7 @@ void helper_lsx_vstelm_d(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_DOUBLE)
     ensure_d_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[sel], oi, GETPC());
+    helper_le_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[sel], oi, GETPC());
 #else
     cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[sel]);
 #endif
@@ -16462,7 +16462,7 @@ void helper_lsx_vstelm_w(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_WORD)
     ensure_w_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[sel], oi, GETPC());
+    helper_le_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[sel], oi, GETPC());
 #else
     cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[sel]);
 #endif
@@ -16477,7 +16477,7 @@ void helper_lsx_vstelm_h(CPULoongArchState *env, uint32_t wd, target_ulong addr,
     MEMOP_IDX(DF_HALF)
     ensure_h_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[sel], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[sel], oi, GETPC());
 #else
     cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[sel]);
 #endif
@@ -16504,7 +16504,7 @@ void helper_lsx_xvldrepl_d(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint64_t data;
     MEMOP_IDX(DF_DOUBLE)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_ldq_mmu(env, addr, oi, GETPC());
+    data = helper_le_ldq_mmu(env, addr, oi, GETPC());
 #else
     data = cpu_ldq_data(env, addr);
 #endif
@@ -16521,7 +16521,7 @@ void helper_lsx_xvldrepl_w(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint32_t data;
     MEMOP_IDX(DF_WORD)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
+    data = helper_le_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
 #else
     data = cpu_ldl_data(env, addr + (0 << DF_WORD));
 #endif
@@ -16538,7 +16538,7 @@ void helper_lsx_xvldrepl_h(CPULoongArchState *env, uint32_t wd, target_ulong add
     uint16_t data;
     MEMOP_IDX(DF_HALF)
 #if !defined(CONFIG_USER_ONLY)
-    data = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
+    data = helper_le_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
 #else
     data = cpu_lduw_data(env, addr + (0 << DF_HALF));
 #endif
@@ -16574,7 +16574,7 @@ void helper_lsx_xvstelm_d(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_DOUBLE)
     ensure_d_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[idx], oi, GETPC());
+    helper_le_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[idx], oi, GETPC());
 #else
     cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[idx]);
 #endif
@@ -16590,7 +16590,7 @@ void helper_lsx_xvstelm_w(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_WORD)
     ensure_w_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[idx], oi, GETPC());
+    helper_le_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[idx], oi, GETPC());
 #else
     cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[idx]);
 #endif
@@ -16606,7 +16606,7 @@ void helper_lsx_xvstelm_h(CPULoongArchState *env, uint32_t wd, target_ulong addr
     MEMOP_IDX(DF_HALF)
     ensure_h_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[idx], oi, GETPC());
+    helper_le_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[idx], oi, GETPC());
 #else
     cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[idx]);
 #endif
