@@ -9625,7 +9625,7 @@ static inline void gen_op_addr_add(DisasContext *ctx,
     tcg_gen_add_tl(ret, arg0, arg1);
 
 //    if (ctx->hflags & LARCH_HFLAG_AWRAP) {
-        tcg_gen_ext32s_i64(ret, ret);
+        //tcg_gen_ext32s_i64(ret, ret);
 //    }
 }
 
