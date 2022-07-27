@@ -3209,7 +3209,7 @@ void helper_msa_ilvev_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[8]  = pws->b[9];
     pwd->b[9]  = pwt->b[9];
     pwd->b[10] = pws->b[11];
@@ -3253,7 +3253,7 @@ void helper_msa_ilvev_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[4] = pws->h[5];
     pwd->h[5] = pwt->h[5];
     pwd->h[6] = pws->h[7];
@@ -3281,7 +3281,7 @@ void helper_msa_ilvev_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[2] = pws->w[3];
     pwd->w[3] = pwt->w[3];
     pwd->w[0] = pws->w[1];
@@ -3313,7 +3313,7 @@ void helper_msa_ilvod_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[7]  = pwt->b[6];
     pwd->b[6]  = pws->b[6];
     pwd->b[5]  = pwt->b[4];
@@ -3357,7 +3357,7 @@ void helper_msa_ilvod_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[3] = pwt->h[2];
     pwd->h[2] = pws->h[2];
     pwd->h[1] = pwt->h[0];
@@ -3385,7 +3385,7 @@ void helper_msa_ilvod_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[1] = pwt->w[0];
     pwd->w[0] = pws->w[0];
     pwd->w[3] = pwt->w[2];
@@ -3417,7 +3417,7 @@ void helper_msa_ilvl_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[7]  = pwt->b[15];
     pwd->b[6]  = pws->b[15];
     pwd->b[5]  = pwt->b[14];
@@ -3461,7 +3461,7 @@ void helper_msa_ilvl_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[3] = pwt->h[7];
     pwd->h[2] = pws->h[7];
     pwd->h[1] = pwt->h[6];
@@ -3489,7 +3489,7 @@ void helper_msa_ilvl_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[1] = pwt->w[3];
     pwd->w[0] = pws->w[3];
     pwd->w[3] = pwt->w[2];
@@ -3521,7 +3521,7 @@ void helper_msa_ilvr_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[8]  = pws->b[0];
     pwd->b[9]  = pwt->b[0];
     pwd->b[10] = pws->b[1];
@@ -3565,7 +3565,7 @@ void helper_msa_ilvr_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[4] = pws->h[0];
     pwd->h[5] = pwt->h[0];
     pwd->h[6] = pws->h[1];
@@ -3593,7 +3593,7 @@ void helper_msa_ilvr_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[2] = pws->w[0];
     pwd->w[3] = pwt->w[0];
     pwd->w[0] = pws->w[1];
@@ -3724,7 +3724,7 @@ void helper_msa_pckev_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[8]  = pws->b[9];
     pwd->b[10] = pws->b[13];
     pwd->b[12] = pws->b[1];
@@ -3768,7 +3768,7 @@ void helper_msa_pckev_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[4] = pws->h[5];
     pwd->h[6] = pws->h[1];
     pwd->h[0] = pwt->h[5];
@@ -3796,7 +3796,7 @@ void helper_msa_pckev_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[2] = pws->w[3];
     pwd->w[0] = pwt->w[3];
     pwd->w[3] = pws->w[1];
@@ -3828,7 +3828,7 @@ void helper_msa_pckod_b(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->b[7]  = pwt->b[6];
     pwd->b[5]  = pwt->b[2];
     pwd->b[3]  = pwt->b[14];
@@ -3873,7 +3873,7 @@ void helper_msa_pckod_h(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->h[3] = pwt->h[2];
     pwd->h[1] = pwt->h[6];
     pwd->h[7] = pws->h[2];
@@ -3901,7 +3901,7 @@ void helper_msa_pckod_w(CPULoongArchState *env,
     wr_t *pws = &(env->fpr[ws].wr);
     wr_t *pwt = &(env->fpr[wt].wr);
 
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     pwd->w[1] = pwt->w[0];
     pwd->w[3] = pws->w[0];
     pwd->w[0] = pwt->w[2];
@@ -5160,7 +5160,7 @@ void helper_msa_copy_s_b(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 16;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 8) {
         n = 8 - n - 1;
     } else {
@@ -5174,7 +5174,7 @@ void helper_msa_copy_s_h(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 8;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 4) {
         n = 4 - n - 1;
     } else {
@@ -5188,7 +5188,7 @@ void helper_msa_copy_s_w(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 4;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 2) {
         n = 2 - n - 1;
     } else {
@@ -5209,7 +5209,7 @@ void helper_msa_copy_u_b(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 16;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 8) {
         n = 8 - n - 1;
     } else {
@@ -5223,7 +5223,7 @@ void helper_msa_copy_u_h(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 8;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 4) {
         n = 4 - n - 1;
     } else {
@@ -5237,7 +5237,7 @@ void helper_msa_copy_u_w(CPULoongArchState *env, uint32_t rd,
                          uint32_t ws, uint32_t n)
 {
     n %= 4;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 2) {
         n = 2 - n - 1;
     } else {
@@ -5253,7 +5253,7 @@ void helper_msa_insert_b(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 16;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 8) {
         n = 8 - n - 1;
     } else {
@@ -5269,7 +5269,7 @@ void helper_msa_insert_h(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 8;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 4) {
         n = 4 - n - 1;
     } else {
@@ -5285,7 +5285,7 @@ void helper_msa_insert_w(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     target_ulong rs = env->gpr[rs_num];
     n %= 4;
-#if defined(HOST_BIG_ENDIAN)
+#if HOST_BIG_ENDIAN
     if (n < 2) {
         n = 2 - n - 1;
     } else {
@@ -7439,7 +7439,7 @@ void helper_msa_ld_b(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     MEMOP_IDX(DF_BYTE)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
     pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
     pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
@@ -7475,7 +7475,7 @@ void helper_msa_ld_b(CPULoongArchState *env, uint32_t wd,
     pwd->b[15] = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
 #endif
 #else
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->b[0]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
     pwd->b[1]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
     pwd->b[2]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
@@ -7519,7 +7519,7 @@ void helper_msa_ld_h(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     MEMOP_IDX(DF_HALF)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->h[0] = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
     pwd->h[1] = helper_ret_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
     pwd->h[2] = helper_ret_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
@@ -7539,7 +7539,7 @@ void helper_msa_ld_h(CPULoongArchState *env, uint32_t wd,
     pwd->h[7] = helper_ret_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
 #endif
 #else
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->h[0] = cpu_lduw_data(env, addr + (0 << DF_HALF));
     pwd->h[1] = cpu_lduw_data(env, addr + (1 << DF_HALF));
     pwd->h[2] = cpu_lduw_data(env, addr + (2 << DF_HALF));
@@ -7567,7 +7567,7 @@ void helper_msa_ld_w(CPULoongArchState *env, uint32_t wd,
     wr_t *pwd = &(env->fpr[wd].wr);
     MEMOP_IDX(DF_WORD)
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->w[0] = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
     pwd->w[1] = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
     pwd->w[2] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
@@ -7579,7 +7579,7 @@ void helper_msa_ld_w(CPULoongArchState *env, uint32_t wd,
     pwd->w[3] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
 #endif
 #else
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     pwd->w[0] = cpu_ldl_data(env, addr + (0 << DF_WORD));
     pwd->w[1] = cpu_ldl_data(env, addr + (1 << DF_WORD));
     pwd->w[2] = cpu_ldl_data(env, addr + (2 << DF_WORD));
@@ -7682,7 +7682,7 @@ void helper_msa_st_h(CPULoongArchState *env, uint32_t wd,
     MEMOP_IDX(DF_HALF)
     ensure_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
     helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
     helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
@@ -7702,7 +7702,7 @@ void helper_msa_st_h(CPULoongArchState *env, uint32_t wd,
     helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
 #endif
 #else
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
     cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
     cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
@@ -7733,7 +7733,7 @@ void helper_msa_st_w(CPULoongArchState *env, uint32_t wd,
     MEMOP_IDX(DF_WORD)
     ensure_writable_pages(env, addr, mmu_idx, GETPC());
 #if !defined(CONFIG_USER_ONLY)
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[0], oi, GETPC());
     helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[1], oi, GETPC());
     helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[2], oi, GETPC());
@@ -7745,7 +7745,7 @@ void helper_msa_st_w(CPULoongArchState *env, uint32_t wd,
     helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[3], oi, GETPC());
 #endif
 #else
-#if !defined(HOST_BIG_ENDIAN)
+#if !HOST_BIG_ENDIAN
     cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
     cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
     cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
